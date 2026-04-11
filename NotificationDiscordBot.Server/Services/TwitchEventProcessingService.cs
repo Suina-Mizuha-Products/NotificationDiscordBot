@@ -78,8 +78,23 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
         }
     }
 
-    public Task<bool> ProcessRevocationAsync(string messageId, string requestBody)
+    public async Task<bool> ProcessRevocationAsync(string messageId, string requestBody)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var revocationData = JsonSerializer.Deserialize<WebhookCallbackRevocation>(requestBody);
+            if (revocationData == null)
+            {
+                _logger.LogWarning("無効な失効データが受信されました。MessageId: {MessageId}", messageId);
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "失効データの処理中にエラーが発生しました。MessageId: {MessageId}", messageId);
+            return false;
+        }
     }
 }
