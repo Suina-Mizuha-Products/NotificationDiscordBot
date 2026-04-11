@@ -7,5 +7,5 @@ public interface ITwitchEventProcessingService
 {
     Task<bool> ProcessNotificationAsync(string messageId, string requestBody, CancellationToken cancellationToken);
     Task<string?> ProcessVerificationAsync(string messageId, string requestBody);
-    Task<bool> ProcessRevocationAsync(string messageId, string requestBody, CancellationToken cancellationToken);
+    Task<bool> ProcessRevocationAsync(string messageId, string requestBody);
 }

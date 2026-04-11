@@ -80,11 +80,11 @@ public class TwitchWebhookController : ControllerBase
                 messageTimestamp);
             return Unauthorized("署名が無効です。");
         }
+        using var scope = _serviceScopeFactory.CreateAsyncScope();
+        var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
 
         if (messageType == WebhookMessageType.Verification)
         {
-            using var scope = _serviceScopeFactory.CreateAsyncScope();
-            var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
             var response = await twitchEventProcessingService.ProcessVerificationAsync(messageId, requestBody);
             if (response == null)
             {
@@ -107,9 +107,6 @@ public class TwitchWebhookController : ControllerBase
             {
                 try
                 {
-                    using var scope = _serviceScopeFactory.CreateScope();
-                    var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
-
                     _logger.LogInformation("Twitchからの通知の処理を開始します。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
                         messageId,
                         messageTimestamp);
@@ -136,7 +133,7 @@ public class TwitchWebhookController : ControllerBase
                 }
             });
 
-            return Ok();
+            return NoContent();
         }
         else if (messageType == WebhookMessageType.Revocation)
         {
@@ -145,8 +142,18 @@ public class TwitchWebhookController : ControllerBase
                 messageId,
                 messageTimestamp);
 
-            // TODO: 一旦レスポンスを返してから、非同期で購読取り消しの処理を行う
-            return Ok();
+            var success = await twitchEventProcessingService.ProcessRevocationAsync(messageId, requestBody);
+
+            if (!success)
+            {
+                _logger.LogWarning("Twitchからの購読取り消しの処理に失敗しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                    messageId,
+                    messageTimestamp);
+
+                return BadRequest("購読取り消しの処理に失敗しました。");
+            }
+
+            return NoContent();
         }
         else
         {

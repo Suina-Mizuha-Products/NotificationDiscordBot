@@ -78,7 +78,7 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
         }
     }
 
-    public Task<bool> ProcessRevocationAsync(string messageId, string requestBody, CancellationToken cancellationToken)
+    public Task<bool> ProcessRevocationAsync(string messageId, string requestBody)
     {
         throw new NotImplementedException();
     }
