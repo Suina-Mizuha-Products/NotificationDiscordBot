@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NotificationDiscordBot.Server.Entity.Twitch;
+using NotificationDiscordBot.Server.Interfaces.Services;
 using NotificationDiscordBot.Server.Interfaces.Services.Twitch;
 using System.Text.Json;
 
@@ -16,13 +17,19 @@ public class TwitchWebhookController : ControllerBase
 {
     private readonly ILogger<TwitchWebhookController> _logger;
     private readonly ITwitchVerifySignatureService _twitchVerifySignatureService;
+    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
     public TwitchWebhookController(
         ILogger<TwitchWebhookController> logger,
-        ITwitchVerifySignatureService twitchVerifySignatureService)
+        ITwitchVerifySignatureService twitchVerifySignatureService,
+        IBackgroundTaskQueue backgroundTaskQueue,
+        IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
         _twitchVerifySignatureService = twitchVerifySignatureService;
+        _backgroundTaskQueue = backgroundTaskQueue;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     [HttpPost]
@@ -76,26 +83,18 @@ public class TwitchWebhookController : ControllerBase
 
         if (messageType == WebhookMessageType.Verification)
         {
-            try
+            using var scope = _serviceScopeFactory.CreateAsyncScope();
+            var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
+            var response = await twitchEventProcessingService.ProcessVerificationAsync(messageId, requestBody);
+            if (response == null)
             {
-                var verificationData = JsonSerializer.Deserialize<WebhookCallbackVerification>(requestBody);
-                if(verificationData is null || string.IsNullOrEmpty(verificationData.Challenge))
-                {
-                    _logger.LogWarning("Twitchからの検証リクエストのChallengeが無効です。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
-                        messageId,
-                        messageTimestamp);
-                    return BadRequest("Challengeが無効です。");
-                }
-
-                return Content(verificationData.Challenge, "text/plain");
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Twitchからの検証リクエストの処理中にエラーが発生しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                _logger.LogWarning("Twitchからの検証リクエストの処理に失敗しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
                     messageId,
                     messageTimestamp);
-                return BadRequest("検証リクエストの処理中にエラーが発生しました。");
+                return BadRequest("検証リクエストの処理に失敗しました。");
             }
+
+            return Content(response, "text/plain");
         }
         else if (messageType == WebhookMessageType.Notification)
         {
@@ -104,7 +103,39 @@ public class TwitchWebhookController : ControllerBase
                 messageId,
                 messageTimestamp);
 
-            // TODO: 一旦レスポンスを返してから、非同期で通知の処理を行う
+            await _backgroundTaskQueue.QueueBackgroundWorkItemAsync(async token =>
+            {
+                try
+                {
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
+
+                    _logger.LogInformation("Twitchからの通知の処理を開始します。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                        messageId,
+                        messageTimestamp);
+
+                    var success = await twitchEventProcessingService.ProcessNotificationAsync(messageId, requestBody, token);
+                    if (!success)
+                    {
+                        _logger.LogWarning("Twitchからの通知の処理に失敗しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                            messageId,
+                            messageTimestamp);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogWarning("Twitchからの通知の処理がキャンセルされました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                        messageId,
+                        messageTimestamp);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Twitchからの通知の処理中にエラーが発生しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                        messageId,
+                        messageTimestamp);
+                }
+            });
+
             return Ok();
         }
         else if (messageType == WebhookMessageType.Revocation)

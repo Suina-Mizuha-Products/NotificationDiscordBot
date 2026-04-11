@@ -28,6 +28,7 @@ builder.Services.AddSingleton<IBackgroundTaskQueue, DefaultBackgroundQueueServic
 builder.Services.AddSingleton<DiscordSocketClient>();
 builder.Services.AddHostedService<DiscordBotService>();
 builder.Services.AddScoped<ITwitchVerifySignatureService, TwitchVerifySignatureService>();
+builder.Services.AddScoped<ITwitchEventProcessingService, TwitchEventProcessingService>();
 
 var app = builder.Build();
 
