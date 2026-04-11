@@ -3,6 +3,9 @@ using Discord.WebSocket;
 
 namespace NotificationDiscordBot.Server.Services.Discord;
 
+/// <summary>
+/// Discord Botの接続とイベント管理を行うサービスクラス。
+/// </summary>
 public class DiscordBotService : BackgroundService, IDisposable
 {
     private readonly ILogger<DiscordBotService> _logger;
