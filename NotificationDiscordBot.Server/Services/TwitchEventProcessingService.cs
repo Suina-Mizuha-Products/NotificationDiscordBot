@@ -1,6 +1,8 @@
 ﻿using NotificationDiscordBot.Server.Entity.Twitch;
 using NotificationDiscordBot.Server.Infrastructure.Serializer.Converters;
 using NotificationDiscordBot.Server.Interfaces.Services;
+using NotificationDiscordBot.Server.Interfaces.Services.Discord;
+using NotificationDiscordBot.Server.Interfaces.Services.Twitch;
 using System.Text.Json;
 
 namespace NotificationDiscordBot.Server.Services;
@@ -8,10 +10,17 @@ namespace NotificationDiscordBot.Server.Services;
 public class TwitchEventProcessingService : ITwitchEventProcessingService
 {
     private readonly ILogger<TwitchEventProcessingService> _logger;
+    private readonly ITwitchApiInvocationService _twitchApiInvocationService;
+    private readonly ISendNotificationService _notificationService;
 
-    public TwitchEventProcessingService(ILogger<TwitchEventProcessingService> logger)
+    public TwitchEventProcessingService(
+        ILogger<TwitchEventProcessingService> logger,
+        ITwitchApiInvocationService twitchApiInvocationService,
+        ISendNotificationService notificationService)
     {
         _logger = logger;
+        _twitchApiInvocationService = twitchApiInvocationService;
+        _notificationService = notificationService;
     }
 
     public async Task<bool> ProcessNotificationAsync(string messageId, string requestBody, CancellationToken cancellationToken)
@@ -45,6 +54,64 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
             {
                 // TODO: 配信開始イベントの処理を実装
                 _logger.LogInformation("配信開始イベントが受信されました。Broadcaster: {BroadcasterUserName}, StreamId: {StreamId}", streamOnlineEvent.BroadcasterUserName, streamOnlineEvent.Id);
+
+                //認証情報の取得
+                var credentials = await _twitchApiInvocationService.GetTwitchCredentialsAsync();
+                if (credentials == null)
+                {
+                    _logger.LogError("Twitchの認証情報の取得に失敗しました。MessageId: {MessageId}", messageId);
+                    return false;
+                }
+
+                #region 見せられないよ
+                streamOnlineEvent.BroadcasterUserId = "720371087";
+                #endregion
+
+                // ストリーム情報の取得
+                var streamData = await _twitchApiInvocationService.GetStreamsAsync(credentials.AccessToken, streamOnlineEvent.BroadcasterUserId);
+                if(streamData == null)
+                {
+                    _logger.LogError("Twitchのストリーム情報の取得に失敗しました。");
+                    return false;
+                }
+
+                var currentStreamData = streamData.Data.FirstOrDefault();
+                if (currentStreamData == null) 
+                {
+                    _logger.LogError("Twitchのストリーム情報の取得に失敗しました。");
+                    return false;
+                }
+
+                var userInfo = await _twitchApiInvocationService.GetUserInfoAsync(credentials.AccessToken, streamOnlineEvent.BroadcasterUserId);
+                if (userInfo == null)
+                {
+                    _logger.LogError("Twitchのユーザー一覧情報の取得に失敗しました。");
+                    return false;
+                }
+
+                var currentUser = userInfo.Data.FirstOrDefault();
+                if(currentUser == null)
+                {
+                    _logger.LogWarning("該当の配信が見つかりませんでした。");
+                    // デプロイ環境で問題があればリトライ処理を追加
+                    return false;
+                }
+
+                var notificationResult = await _notificationService.SendTwitchOnlineNotificationMessageAsync(
+                    currentStreamData.UserLogin,
+                    currentStreamData.UserName,
+                    currentUser.ProfileImageUrl,
+                    currentStreamData.Title,
+                    currentStreamData.GameName,
+                    currentStreamData.StartedAt,
+                    currentStreamData.ThumbnailUrl);
+
+                if (!notificationResult)
+                {
+                    _logger.LogWarning("通知送信処理に失敗しました。");
+                    return false;
+                }
+
                 return true;
             }
 

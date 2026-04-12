@@ -1,5 +1,6 @@
 using Discord.WebSocket;
 using NotificationDiscordBot.Server.Interfaces.Services;
+using NotificationDiscordBot.Server.Interfaces.Services.Discord;
 using NotificationDiscordBot.Server.Interfaces.Services.Twitch;
 using NotificationDiscordBot.Server.Services;
 using NotificationDiscordBot.Server.Services.Discord;
@@ -15,6 +16,8 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddHostedService<QueueHostedService>();
 builder.Services.AddSingleton<IBackgroundTaskQueue, DefaultBackgroundQueueService>(_ =>
 {
@@ -28,7 +31,9 @@ builder.Services.AddSingleton<IBackgroundTaskQueue, DefaultBackgroundQueueServic
 builder.Services.AddSingleton<DiscordSocketClient>();
 builder.Services.AddHostedService<DiscordBotService>();
 builder.Services.AddScoped<ITwitchVerifySignatureService, TwitchVerifySignatureService>();
+builder.Services.AddScoped<ITwitchApiInvocationService, TwitchApiInvocationService>();
 builder.Services.AddScoped<ITwitchEventProcessingService, TwitchEventProcessingService>();
+builder.Services.AddScoped<ISendNotificationService, SendNotificationService>();
 
 var app = builder.Build();
 
