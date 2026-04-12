@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Tests/">
+    <Project Path="NotificationDiscordBot.Server.Test/NotificationDiscordBot.Server.Test.csproj" Id="27c08e60-a412-430b-82ff-bf860f29a214" />
+  </Folder>
   <Project Path="NotificationDiscordBot.AppHost/NotificationDiscordBot.AppHost.csproj" />
   <Project Path="NotificationDiscordBot.Server/NotificationDiscordBot.Server.csproj" />
   <Project Path="NotificationDiscordBot.ServiceDefaults/NotificationDiscordBot.ServiceDefaults.csproj" />
