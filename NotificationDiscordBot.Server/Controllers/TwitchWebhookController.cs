@@ -122,6 +122,7 @@ public class TwitchWebhookController : ControllerBase
                         _logger.LogWarning(Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_FAILED,
                             messageId,
                             messageTimestamp);
+                        return;
                     }
                     _logger.LogInformation(Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_COMPLETED,
                         messageId,
