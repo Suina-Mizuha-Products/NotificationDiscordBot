@@ -298,7 +298,11 @@ public class TwitchWebhookControllerTest
 
         // 署名が無効と仮定してモックを設定
         _twitchVerifySignatureServiceMock
-            .Setup(service => service.VerifySignature(messageId, messageTimestamp, messageType, signature))
+            .Setup(service => service.VerifySignature(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>()))
             .Returns(false);
 
         var controller = new TwitchWebhookController(
