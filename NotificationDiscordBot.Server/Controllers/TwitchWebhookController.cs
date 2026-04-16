@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NotificationDiscordBot.Server.Entity;
 using NotificationDiscordBot.Server.Entity.Twitch;
 using NotificationDiscordBot.Server.Interfaces.Services;
 using NotificationDiscordBot.Server.Interfaces.Services.Twitch;
@@ -45,21 +46,21 @@ public class TwitchWebhookController : ControllerBase
             string.IsNullOrEmpty(messageType) ||
             string.IsNullOrEmpty(signature))
         {
-            _logger.LogWarning("Twitchからのリクエストに必要なヘッダーが不足しています。");
+            _logger.LogWarning(Constants.TwitchWebhookController.REQUEST_HEADER_MISSING);
             return BadRequest("必要なヘッダーが不足しています。");
         }
 
         // タイムスタンプの検証（5分以上前のリクエストは拒否）
         if (!DateTime.TryParse(messageTimestamp, out var timestamp))
         {
-            _logger.LogWarning("Twitchからのリクエストのタイムスタンプが無効です。MessageTimestamp: {MessageTimestamp}",
+            _logger.LogWarning(Constants.TwitchWebhookController.REQUEST_TIMESTAMP_INVALID,
                 messageTimestamp);
             return BadRequest("タイムスタンプが無効です。");
         }
         var currentTime = DateTime.UtcNow;
         if (currentTime - timestamp > TimeSpan.FromMinutes(5))
         {
-            _logger.LogWarning("Twitchからのリクエストのタイムスタンプが古すぎます。CurrentTime: {CurrentTime}, RequestTime: {RequestTime}",
+            _logger.LogWarning(Constants.TwitchWebhookController.REQUEST_TIMESTAMP_TOO_OLD,
                 currentTime,
                 timestamp);
             return BadRequest("タイムスタンプが古すぎます。");
@@ -75,7 +76,7 @@ public class TwitchWebhookController : ControllerBase
         var isValid = _twitchVerifySignatureService.VerifySignature(messageId, messageTimestamp, requestBody, signature);
         if (!isValid)
         {
-            _logger.LogWarning("Twitchからのリクエストの署名が無効です。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+            _logger.LogWarning(Constants.TwitchWebhookController.REQUEST_SIGNATURE_INVALID,
                 messageId,
                 messageTimestamp);
             return Unauthorized("署名が無効です。");
@@ -88,7 +89,7 @@ public class TwitchWebhookController : ControllerBase
             var response = await twitchEventProcessingService.ProcessVerificationAsync(messageId, requestBody);
             if (response == null)
             {
-                _logger.LogWarning("Twitchからの検証リクエストの処理に失敗しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                _logger.LogWarning(Constants.TwitchWebhookController.VERIFICATION_FAILED,
                     messageId,
                     messageTimestamp);
                 return BadRequest("検証リクエストの処理に失敗しました。");
@@ -99,7 +100,7 @@ public class TwitchWebhookController : ControllerBase
         else if (messageType == WebhookMessageType.Notification)
         {
             // 通知の処理
-            _logger.LogInformation("Twitchからの通知を受信しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+            _logger.LogInformation(Constants.TwitchWebhookController.EVENT_NOTIFICATION_RECEIVED,
                 messageId,
                 messageTimestamp);
 
@@ -107,27 +108,30 @@ public class TwitchWebhookController : ControllerBase
             {
                 try
                 {
-                    _logger.LogInformation("Twitchからの通知の処理を開始します。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                    _logger.LogInformation(Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_STARTED,
                         messageId,
                         messageTimestamp);
 
                     var success = await twitchEventProcessingService.ProcessNotificationAsync(messageId, requestBody, token);
                     if (!success)
                     {
-                        _logger.LogWarning("Twitchからの通知の処理に失敗しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                        _logger.LogWarning(Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_FAILED,
                             messageId,
                             messageTimestamp);
                     }
+                    _logger.LogInformation(Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_COMPLETED,
+                        messageId,
+                        messageTimestamp);
                 }
                 catch (OperationCanceledException)
                 {
-                    _logger.LogWarning("Twitchからの通知の処理がキャンセルされました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                    _logger.LogWarning(Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_CANCELED,
                         messageId,
                         messageTimestamp);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Twitchからの通知の処理中にエラーが発生しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                    _logger.LogError(ex, Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_THROWN_EXCEPTION,
                         messageId,
                         messageTimestamp);
                 }
@@ -138,7 +142,7 @@ public class TwitchWebhookController : ControllerBase
         else if (messageType == WebhookMessageType.Revocation)
         {
             // 購読の取り消しの処理
-            _logger.LogInformation("Twitchからの購読取り消しを受信しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+            _logger.LogInformation(Constants.TwitchWebhookController.REVOCATION_RECEIVED,
                 messageId,
                 messageTimestamp);
 
@@ -146,7 +150,7 @@ public class TwitchWebhookController : ControllerBase
 
             if (!success)
             {
-                _logger.LogWarning("Twitchからの購読取り消しの処理に失敗しました。MessageId: {MessageId}, MessageTimestamp: {MessageTimestamp}",
+                _logger.LogWarning(Constants.TwitchWebhookController.REVOCATION_PROCESSING_FAILED,
                     messageId,
                     messageTimestamp);
 
@@ -157,7 +161,7 @@ public class TwitchWebhookController : ControllerBase
         }
         else
         {
-            _logger.LogWarning("TwitchからのリクエストのMessageTypeが不明です。MessageType: {MessageType}",
+            _logger.LogWarning(Constants.TwitchWebhookController.REQUEST_UNKNOWN_MESSAGE_TYPE,
                 messageType);
             return BadRequest("不明なMessageTypeです。");
         }
