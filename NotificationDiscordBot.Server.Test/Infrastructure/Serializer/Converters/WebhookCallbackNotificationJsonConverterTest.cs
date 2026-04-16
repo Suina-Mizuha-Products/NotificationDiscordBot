@@ -59,12 +59,12 @@ public class WebhookCallbackNotificationJsonConverterTest
     public void Success_Read_未処理のイベントが来た場合UnknownEvent型で処理される()
     {
         // Arrange
-        // サンプルのJsonデータ(Twitch CLIを元に作成)
+        // サンプルのJsonデータ
         var json = @"{
           ""subscription"": {
             ""id"": ""test-subscription-id"",
             ""status"": ""enabled"",
-            ""type"": ""channel.subscribe"",
+            ""type"": ""unknown.event"",
             ""version"": ""1"",
             ""condition"": {
               ""broadcaster_user_id"": ""88915298""
@@ -92,8 +92,7 @@ public class WebhookCallbackNotificationJsonConverterTest
         // Assert
         Assert.NotNull(notification);
         Assert.Equal("test-subscription-id", notification.Subscription.Id);
-        // TODO: ハンドリングが追加された場合は随時更新
-        Assert.NotEqual("stream.online", notification.Subscription.Type);
+        Assert.Equal("unknown.event", notification.Subscription.Type);
 
         Assert.IsType<UnknownEvent>(notification.Event);
     }
