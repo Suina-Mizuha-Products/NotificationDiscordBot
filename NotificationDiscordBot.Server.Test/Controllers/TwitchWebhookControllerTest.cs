@@ -10,7 +10,6 @@ using NotificationDiscordBot.Server.Interfaces.Services;
 using NotificationDiscordBot.Server.Interfaces.Services.Twitch;
 using NotificationDiscordBot.Server.Test.Mock;
 using System.Text;
-using Xunit.Internal;
 
 namespace NotificationDiscordBot.Server.Test;
 
