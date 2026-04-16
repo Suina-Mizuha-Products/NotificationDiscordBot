@@ -81,11 +81,12 @@ public class TwitchWebhookController : ControllerBase
                 messageTimestamp);
             return Unauthorized("署名が無効です。");
         }
-        using var scope = _serviceScopeFactory.CreateAsyncScope();
-        var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
 
-        if (messageType == WebhookMessageType.Verification)
+        if (messageType == WebhookMessageType.VARIFICATION)
         {
+            using var scope = _serviceScopeFactory.CreateAsyncScope();
+            var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
+
             var response = await twitchEventProcessingService.ProcessVerificationAsync(messageId, requestBody);
             if (response == null)
             {
@@ -97,7 +98,7 @@ public class TwitchWebhookController : ControllerBase
 
             return Content(response, "text/plain");
         }
-        else if (messageType == WebhookMessageType.Notification)
+        else if (messageType == WebhookMessageType.NOTIFICATION)
         {
             // 通知の処理
             _logger.LogInformation(Constants.TwitchWebhookController.EVENT_NOTIFICATION_RECEIVED,
@@ -111,6 +112,9 @@ public class TwitchWebhookController : ControllerBase
                     _logger.LogInformation(Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_STARTED,
                         messageId,
                         messageTimestamp);
+
+                    using var scope = _serviceScopeFactory.CreateAsyncScope();
+                    var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
 
                     var success = await twitchEventProcessingService.ProcessNotificationAsync(messageId, requestBody, token);
                     if (!success)
@@ -139,12 +143,15 @@ public class TwitchWebhookController : ControllerBase
 
             return NoContent();
         }
-        else if (messageType == WebhookMessageType.Revocation)
+        else if (messageType == WebhookMessageType.REVOCATION)
         {
             // 購読の取り消しの処理
             _logger.LogInformation(Constants.TwitchWebhookController.REVOCATION_RECEIVED,
                 messageId,
                 messageTimestamp);
+
+            using var scope = _serviceScopeFactory.CreateAsyncScope();
+            var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
 
             var success = await twitchEventProcessingService.ProcessRevocationAsync(messageId, requestBody);
 
