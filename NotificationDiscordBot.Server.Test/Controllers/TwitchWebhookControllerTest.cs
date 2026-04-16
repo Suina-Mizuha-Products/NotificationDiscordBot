@@ -108,7 +108,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         string? messageId = null; // ヘッダーが不足している場合
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Verification;
+        var messageType = WebhookMessageType.VARIFICATION;
         var signature = "test-signature";
         var controller = new TwitchWebhookController(
             _loggerMock.Object,
@@ -127,7 +127,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         string? messageTimestamp = null; // ヘッダーが不足している場合
-        var messageType = WebhookMessageType.Verification;
+        var messageType = WebhookMessageType.VARIFICATION;
         var signature = "test-signature";
         var controller = new TwitchWebhookController(
             _loggerMock.Object,
@@ -165,7 +165,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Verification;
+        var messageType = WebhookMessageType.VARIFICATION;
         string? signature = null; // ヘッダーが不足している場合
         var controller = new TwitchWebhookController(
             _loggerMock.Object,
@@ -223,7 +223,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = "invalid-timestamp"; // 無効なタイムスタンプ
-        var messageType = WebhookMessageType.Verification;
+        var messageType = WebhookMessageType.VARIFICATION;
         var signature = "test-signature";
         _twitchVerifySignatureServiceMock
             .Setup(service => service.VerifySignature(
@@ -259,7 +259,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.AddMinutes(-6).ToString("o"); // 5分以上前のタイムスタンプ
-        var messageType = WebhookMessageType.Verification;
+        var messageType = WebhookMessageType.VARIFICATION;
         var signature = "test-signature";
         _twitchVerifySignatureServiceMock
             .Setup(service => service.VerifySignature(
@@ -295,7 +295,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Verification;
+        var messageType = WebhookMessageType.VARIFICATION;
         var signature = "invalid-signature";
 
         // 署名が無効と仮定してモックを設定
@@ -340,7 +340,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Verification;
+        var messageType = WebhookMessageType.VARIFICATION;
         var signature = "test-signature";
 
         // 署名が正しいと仮定してモックを設定
@@ -389,7 +389,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Verification;
+        var messageType = WebhookMessageType.VARIFICATION;
         var signature = "test-signature";
         // 署名が正しいと仮定してモックを設定
         _twitchVerifySignatureServiceMock
@@ -437,7 +437,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Notification;
+        var messageType = WebhookMessageType.NOTIFICATION;
         var signature = "test-signature";
         // 署名が正しいと仮定してモックを設定
         _twitchVerifySignatureServiceMock
@@ -508,7 +508,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Notification;
+        var messageType = WebhookMessageType.NOTIFICATION;
         var signature = "test-signature";
         // 署名が正しいと仮定してモックを設定
         _twitchVerifySignatureServiceMock
@@ -572,7 +572,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Notification;
+        var messageType = WebhookMessageType.NOTIFICATION;
         var signature = "test-signature";
         // 署名が正しいと仮定してモックを設定
         _twitchVerifySignatureServiceMock
@@ -636,7 +636,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Notification;
+        var messageType = WebhookMessageType.NOTIFICATION;
         var signature = "test-signature";
         // 署名が正しいと仮定してモックを設定
         _twitchVerifySignatureServiceMock
@@ -704,7 +704,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Revocation;
+        var messageType = WebhookMessageType.REVOCATION;
         var signature = "test-signature";
         // 署名が正しいと仮定してモックを設定
         _twitchVerifySignatureServiceMock
@@ -748,7 +748,7 @@ public class TwitchWebhookControllerTest
         // Arrange
         var messageId = "test-message-id";
         var messageTimestamp = DateTime.UtcNow.ToString("o");
-        var messageType = WebhookMessageType.Revocation;
+        var messageType = WebhookMessageType.REVOCATION;
         var signature = "test-signature";
         // 署名が正しいと仮定してモックを設定
         _twitchVerifySignatureServiceMock
