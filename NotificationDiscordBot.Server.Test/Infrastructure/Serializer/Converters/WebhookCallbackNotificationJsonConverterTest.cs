@@ -93,8 +93,14 @@ public class WebhookCallbackNotificationJsonConverterTest
         Assert.NotNull(notification);
         Assert.Equal("test-subscription-id", notification.Subscription.Id);
         Assert.Equal("unknown.event", notification.Subscription.Type);
-
         Assert.IsType<UnknownEvent>(notification.Event);
+
+        var unknownEvent = (UnknownEvent)notification.Event;
+        // UnknownEventのRawDataが正しく保持されていることを確認
+        var rawText = unknownEvent.RawData.GetRawText();
+        Assert.NotNull(rawText);
+        Assert.Contains(@"""user_id"": ""19117137""", rawText);
+        Assert.Contains(@"""broadcaster_user_name"": ""testBroadcaster""", rawText);
     }
 
     [Fact]
