@@ -4,11 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NotificationDiscordBot.Server.Controllers;
+using NotificationDiscordBot.Server.Entity;
 using NotificationDiscordBot.Server.Entity.Twitch;
 using NotificationDiscordBot.Server.Interfaces.Services;
 using NotificationDiscordBot.Server.Interfaces.Services.Twitch;
 using NotificationDiscordBot.Server.Test.Mock;
 using System.Text;
+using Xunit.Internal;
 
 namespace NotificationDiscordBot.Server.Test;
 
@@ -16,7 +18,7 @@ public class TwitchWebhookControllerTest
 {
     private readonly Mock<ILogger<TwitchWebhookController>> _loggerMock;
     private readonly Mock<ITwitchVerifySignatureService> _twitchVerifySignatureServiceMock;
-    private readonly IBackgroundTaskQueue _backgroundTaskQueueMock;
+    private readonly MockBackgroundQueueTask _backgroundTaskQueueMock;
     private readonly Mock<IServiceScopeFactory> _serviceScopeFactoryMock;
     private readonly Mock<ITwitchEventProcessingService> _eventProcessingServiceMock;
 
@@ -469,14 +471,39 @@ public class TwitchWebhookControllerTest
                 }
             }
         };
-        // Act
+        // Act API
         var result = await controller.ReceiveWebhookAsync(messageId, messageTimestamp, messageType, signature);
-        // Assert
+
+        // Assert API
         Assert.IsType<NoContentResult>(result);
+
+        // Act Background
+        var backgroundTask = await _backgroundTaskQueueMock.BackgroundWorkItem;
+        Assert.NotNull(backgroundTask);
+
+        await backgroundTask(CancellationToken.None);
+
+        // Assert Background
+        _eventProcessingServiceMock.Verify(service => service.ProcessNotificationAsync(
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        var expectedLogMessage = Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_COMPLETED
+            .Replace("{MessageId}", messageId)
+            .Replace("{MessageTimestamp}", messageTimestamp);
+
+        _loggerMock.Verify(
+            logger => logger.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Information),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(expectedLogMessage)),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)), Times.Once);
     }
 
     [Fact]
-    public async Task Success_Event_イベント処理が失敗した場合もAPIに波及せずNoContentが返される()
+    public async Task Success_Event_イベント処理が失敗した場合NoContentが返されバックグラウンドで適切なログが記録される()
     {
         // Arrange
         var messageId = "test-message-id";
@@ -514,14 +541,33 @@ public class TwitchWebhookControllerTest
                 }
             }
         };
-        // Act
+        // Act API
         var result = await controller.ReceiveWebhookAsync(messageId, messageTimestamp, messageType, signature);
-        // Assert
+        // Assert API
         Assert.IsType<NoContentResult>(result);
+
+        // Act Background
+        var backgroundTask = await _backgroundTaskQueueMock.BackgroundWorkItem;
+        Assert.NotNull(backgroundTask);
+
+        await backgroundTask(CancellationToken.None);
+
+        // Assert Background
+        var expectedLogMessage = Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_FAILED
+            .Replace("{MessageId}", messageId)
+            .Replace("{MessageTimestamp}", messageTimestamp);
+
+        _loggerMock.Verify(
+            logger => logger.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Warning),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(expectedLogMessage)),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)), Times.Once);
     }
 
     [Fact]
-    public async Task Success_Event_イベント処理がキャンセルされた場合でも例外がAPIに波及せずNoContentが返される()
+    public async Task Success_Event_イベント処理がキャンセルされた場合NoContentが返され適切なログが記録される()
     {
         // Arrange
         var messageId = "test-message-id";
@@ -559,14 +605,33 @@ public class TwitchWebhookControllerTest
                 }
             }
         };
-        // Act
+        // Act API
         var result = await controller.ReceiveWebhookAsync(messageId, messageTimestamp, messageType, signature);
-        // Assert
+        // Assert API
         Assert.IsType<NoContentResult>(result);
+
+        // Act Background
+        var backgroundTask = await _backgroundTaskQueueMock.BackgroundWorkItem;
+        Assert.NotNull(backgroundTask);
+
+        await backgroundTask(CancellationToken.None);
+
+        // Assert Background
+        var expectedLogMessage = Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_CANCELED
+            .Replace("{MessageId}", messageId)
+            .Replace("{MessageTimestamp}", messageTimestamp);
+
+        _loggerMock.Verify(
+            logger => logger.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Warning),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(expectedLogMessage)),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)), Times.Once);
     }
 
     [Fact]
-    public async Task Success_Event_イベント処理中に例外が発生してもAPIに波及せずNoContentが返される()
+    public async Task Success_Event_イベント処理中に例外が発生した場合NoContentが返され適切なログが記録される()
     {
         // Arrange
         var messageId = "test-message-id";
@@ -604,10 +669,29 @@ public class TwitchWebhookControllerTest
                 }
             }
         };
-        // Act
+        // Act API
         var result = await controller.ReceiveWebhookAsync(messageId, messageTimestamp, messageType, signature);
-        // Assert
+        // Assert API
         Assert.IsType<NoContentResult>(result);
+
+        // Act Background
+        var backgroundTask = await _backgroundTaskQueueMock.BackgroundWorkItem;
+        Assert.NotNull(backgroundTask);
+
+        await backgroundTask(CancellationToken.None);
+
+        // Assert Background
+        var expectedLogMessage = Constants.TwitchWebhookController.EVENT_NOTIFICATION_PROCESSING_THROWN_EXCEPTION
+            .Replace("{MessageId}", messageId)
+            .Replace("{MessageTimestamp}", messageTimestamp);
+
+        _loggerMock.Verify(
+            logger => logger.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(expectedLogMessage)),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)), Times.Once);
     }
 
     #endregion
