@@ -97,10 +97,8 @@ public class WebhookCallbackNotificationJsonConverterTest
 
         var unknownEvent = (UnknownEvent)notification.Event;
         // UnknownEventのRawDataが正しく保持されていることを確認
-        var rawText = unknownEvent.RawData.GetRawText();
-        Assert.NotNull(rawText);
-        Assert.Contains(@"""user_id"": ""19117137""", rawText);
-        Assert.Contains(@"""broadcaster_user_name"": ""testBroadcaster""", rawText);
+        Assert.Equal("19117137", unknownEvent.RawData.GetProperty("user_id").GetString());
+        Assert.Equal("testFromUser", unknownEvent.RawData.GetProperty("user_login").GetString());
     }
 
     [Fact]
