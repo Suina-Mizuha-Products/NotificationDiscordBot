@@ -51,18 +51,21 @@ public class WebhookCallbackNotificationJsonConverter : JsonConverter<WebhookCal
 
         // 'event'プロパティを取得してデシリアライズ
         EventBase? eventData;
+        JsonElement eventJsonElement;
         if (!root.TryGetProperty("event", out var eventElement))
         {
             throw new JsonException("'event'プロパティが見つかりませんでした。");
         }
 
+        eventJsonElement = eventElement.Clone();
+
         if (eventType == typeof(UnknownEvent))
         {
-            eventData = new UnknownEvent { RawData = eventElement };
+            eventData = new UnknownEvent { RawData = eventJsonElement };
         }
         else
         {
-            eventData = (EventBase?)eventElement.Deserialize(eventType, options);
+            eventData = (EventBase?)eventJsonElement.Deserialize(eventType, options);
         }
 
         if (eventData == null)
