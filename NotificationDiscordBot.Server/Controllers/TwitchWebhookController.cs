@@ -26,10 +26,10 @@ public class TwitchWebhookController : ControllerBase
         IBackgroundTaskQueue backgroundTaskQueue,
         IServiceScopeFactory serviceScopeFactory)
     {
-        _logger = logger;
-        _twitchVerifySignatureService = twitchVerifySignatureService;
-        _backgroundTaskQueue = backgroundTaskQueue;
-        _serviceScopeFactory = serviceScopeFactory;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _twitchVerifySignatureService = twitchVerifySignatureService ?? throw new ArgumentNullException(nameof(twitchVerifySignatureService));
+        _backgroundTaskQueue = backgroundTaskQueue ?? throw new ArgumentNullException(nameof(backgroundTaskQueue));
+        _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
     }
 
     [HttpPost]
