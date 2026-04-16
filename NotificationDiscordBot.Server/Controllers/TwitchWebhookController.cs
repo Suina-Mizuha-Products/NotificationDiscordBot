@@ -82,7 +82,7 @@ public class TwitchWebhookController : ControllerBase
             return Unauthorized("署名が無効です。");
         }
 
-        if (messageType == WebhookMessageType.VARIFICATION)
+        if (messageType == WebhookMessageType.VERIFICATION)
         {
             using var scope = _serviceScopeFactory.CreateAsyncScope();
             var twitchEventProcessingService = scope.ServiceProvider.GetRequiredService<ITwitchEventProcessingService>();
