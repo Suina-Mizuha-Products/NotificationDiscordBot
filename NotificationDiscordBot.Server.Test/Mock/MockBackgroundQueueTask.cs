@@ -6,7 +6,7 @@ public class MockBackgroundQueueTask : IBackgroundTaskQueue
 {
     public ValueTask<Func<CancellationToken, ValueTask>> DequeueAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException("DequeueAsyncは現在使用されないためサポートされていません。");
     }
 
     public ValueTask QueueBackgroundWorkItemAsync(Func<CancellationToken, ValueTask> workItem)
