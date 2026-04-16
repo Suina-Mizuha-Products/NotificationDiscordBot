@@ -77,35 +77,9 @@ public class WebhookCallbackNotificationJsonConverter : JsonConverter<WebhookCal
         };
     }
 
-    /// <summary>
-    /// WebhookCallbackNotification オブジェクトを JSON 形式で書き込みます。
-    /// </summary>
-    /// <remarks>このメソッドは 'subscription' および 'event' プロパティを含む JSON オブジェクトとして WebhookCallbackNotification
-    /// を出力します。'event' の型に応じてシリアル化方法が異なります。</remarks>
-    /// <param name="writer">JSON データの書き込み先となる Utf8JsonWriter。</param>
-    /// <param name="value">シリアル化する WebhookCallbackNotification オブジェクト。null であってはなりません。</param>
-    /// <param name="options">シリアル化の動作を制御するための JsonSerializerOptions。</param>
     public override void Write(Utf8JsonWriter writer, WebhookCallbackNotification value, JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-
-        writer.WritePropertyName("subscription");   
-        JsonSerializer.Serialize(writer, value.Subscription, options);
-
-        writer.WritePropertyName("event");
-        switch(value.Event)
-        {
-            case StreamOnlineEvent streamOnlineEvent:
-                JsonSerializer.Serialize(writer, streamOnlineEvent, options);
-                break;
-            case UnknownEvent unknownEvent:
-                unknownEvent.RawData.WriteTo(writer);
-                break;
-            default:
-                JsonSerializer.Serialize(writer, value.Event, options);
-                break;
-        }
-
-        writer.WriteEndObject();
+        // WebhookCallbackNotification型からのシリアル化を行うユースケースは想定されていないため、NotSupportedExceptionをスローします。
+        throw new NotSupportedException("WebhookCallbackNotification のシリアル化はサポートされていません。");
     }
 }
