@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        議論の場を提供します。以下のフォームに詳細をご記入ください。
+        以下のフォームに詳細をご記入ください。
   - type: textarea
     id: description
     attributes:

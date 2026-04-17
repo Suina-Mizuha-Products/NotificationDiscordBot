@@ -1,12 +1,12 @@
 name: 機能追加
-description: 新機能や改善を提案する
+description: 新機能や改善を行う
 title: "[Feature] "
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        機能追加の提案ありがとうございます。以下のフォームに詳細をご記入ください。
+        以下のフォームに詳細をご記入ください。
   - type: textarea
     id: description
     attributes:
@@ -21,11 +21,15 @@ body:
       description: なぜこの機能が必要なのかを記述してください。
     validations:
       required: true
-  - type: textarea
-    id: proposal
+  - type: markdown
+    id: work
     attributes:
-      label: 提案内容
-      description: 実装方法や具体的なアイデアがあれば記述してください。
+      value: |
+        ### 作業内容
+        - [ ] 仕様策定
+        - [ ] 設計
+        - [ ] 実装
+        - [ ] テスト
   - type: textarea
     id: additional
     attributes:
