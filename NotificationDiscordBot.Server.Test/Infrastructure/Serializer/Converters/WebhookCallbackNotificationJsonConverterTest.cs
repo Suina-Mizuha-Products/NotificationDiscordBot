@@ -90,7 +90,8 @@ public class WebhookCallbackNotificationJsonConverterTest
         // Act
         var notification = JsonSerializer.Deserialize<WebhookCallbackNotification>(json, _options);
         // Assert
-        Assert.Equal("test-subscription-id", notification!.Subscription.Id);
+        Assert.NotNull(notification);
+        Assert.Equal("test-subscription-id", notification.Subscription.Id);
         Assert.Equal("unknown.event", notification.Subscription.Type);
         var unknownEvent = Assert.IsType<UnknownEvent>(notification.Event);
 
