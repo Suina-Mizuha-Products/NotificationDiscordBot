@@ -1,0 +1,63 @@
+name: バグ報告/修正
+description: バグや不具合を報告する
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        以下のフォームに詳細をご記入ください。
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      description: バグの概要を簡潔に記述してください。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: バグを再現するための手順を記述してください。
+      placeholder: |
+        1. ～に移動する
+        2. ～をクリックする
+        3. ～を確認する
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待する動作
+      description: 本来どのような動作が期待されるかを記述してください。
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際の動作
+      description: 実際にどのような動作が発生しているかを記述してください。
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境
+      description: 発生した環境を記述してください。
+      placeholder: |
+        - OS: Windows 11 / macOS 14 / Ubuntu 22.04
+        - .NET バージョン: 9.0
+        - その他関連情報
+  - type: markdown
+    id: work
+    attributes:
+      value: |
+        ### 作業内容
+        - [ ] 調査
+        - [ ] 修正
+        - [ ] テスト
+  - type: textarea
+    id: additional
+    attributes:
+      label: その他
+      description: その他、補足情報があれば記述してください。（スクリーンショット、ログ等）

@@ -1,0 +1,37 @@
+name: 機能追加
+description: 新機能や改善を行う
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        以下のフォームに詳細をご記入ください。
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      description: 提案する機能の概要を簡潔に記述してください。
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 背景・動機
+      description: なぜこの機能が必要なのかを記述してください。
+    validations:
+      required: true
+  - type: markdown
+    id: work
+    attributes:
+      value: |
+        ### 作業内容
+        - [ ] 仕様策定
+        - [ ] 設計
+        - [ ] 実装
+        - [ ] テスト
+  - type: textarea
+    id: additional
+    attributes:
+      label: その他
+      description: その他、補足情報があれば記述してください。

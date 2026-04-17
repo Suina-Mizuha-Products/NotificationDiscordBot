@@ -1,0 +1,33 @@
+name: 議論
+description: 設計・方針などについて議論する
+title: "[Discussion] "
+labels: ["discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        以下のフォームに詳細をご記入ください。
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      description: 議論したいトピックの概要を記述してください。
+    validations:
+      required: true
+  - type: textarea
+    id: background
+    attributes:
+      label: 背景
+      description: このトピックを議論する背景や文脈を記述してください。
+  - type: textarea
+    id: points
+    attributes:
+      label: 議論のポイント
+      description: 議論したい具体的なポイントを記述してください。
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: その他
+      description: その他、補足情報があれば記述してください。
