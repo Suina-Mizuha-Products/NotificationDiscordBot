@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using IDiscordClient = NotificationDiscordBot.Server.Interfaces.Services.Discord.IDiscordClient;
 
 namespace NotificationDiscordBot.Server.Services.Discord;
 
@@ -11,17 +12,22 @@ public class DiscordBotService : BackgroundService, IDisposable
     private readonly ILogger<DiscordBotService> _logger;
     private readonly IConfiguration _configuration;
     private readonly string _discordToken;
-    private readonly DiscordSocketClient _client;
+    private readonly IDiscordClient _client;
 
     public DiscordBotService(
         ILogger<DiscordBotService> logger,
         IConfiguration configuration,
-        DiscordSocketClient client)
+        IDiscordClient client)
     {
-        _logger = logger;
-        _configuration = configuration;
-        _discordToken = _configuration["Discord:Token"] ?? throw new InvalidOperationException("DiscordのTokenが構成されていません。");
-        _client = client;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        var token = _configuration["Discord:Token"];
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            throw new InvalidOperationException("Discordのトークンが設定されていません。");
+        }
+        _discordToken = token;
+        _client = client ?? throw new ArgumentNullException(nameof(client));
 
         #region イベント登録
         _client.Log += LogAsync;
@@ -50,27 +56,55 @@ public class DiscordBotService : BackgroundService, IDisposable
         #endregion
 
         base.Dispose();
+        GC.SuppressFinalize(this);
     }
 
-    private async Task LogAsync(LogMessage logMessage)
+    private Task LogAsync(LogMessage logMessage)
     {
-        _logger.LogInformation(logMessage.ToString());
+        switch (logMessage.Severity)
+        {
+            case LogSeverity.Critical:
+                _logger.LogCritical(logMessage.Exception, "{Message}", logMessage.Message);
+                break;
+            case LogSeverity.Error:
+                _logger.LogError(logMessage.Exception, "{Message}", logMessage.Message);
+                break;
+            case LogSeverity.Warning:
+                _logger.LogWarning("{Message}", logMessage.Message);
+                break;
+            case LogSeverity.Info:
+                _logger.LogInformation("{Message}", logMessage.Message);
+                break;
+            case LogSeverity.Verbose:
+                _logger.LogTrace("{Message}", logMessage.Message);
+                break;
+            case LogSeverity.Debug:
+                _logger.LogDebug("{Message}", logMessage.Message);
+                break;
+            default:
+                _logger.LogInformation("{Message}", logMessage.Message);
+                break;
+        }
+        return Task.CompletedTask;
     }
 
-    private async Task ReadyAsync()
+    private Task ReadyAsync()
     {
-        _logger.LogInformation("DiscordBotの準備完了。CurrentUserId: {CurrentUserId}, CurrentUserName: {CirrentUserName}", 
+        _logger.LogInformation("DiscordBotの準備完了。CurrentUserId: {CurrentUserId}, CurrentUserName: {CurrentUserName}", 
             _client.CurrentUser.Id,
             _client.CurrentUser.Username);
+        return Task.CompletedTask;
     }
 
-    private async Task OnConnectedAsync()
+    private Task OnConnectedAsync()
     {
         _logger.LogInformation("Discordへの接続完了。");
+        return Task.CompletedTask;
     }
 
-    private async Task OnExceptionAsync(Exception exception)
+    private Task OnExceptionAsync(Exception exception)
     {
         _logger.LogError(exception, "Discord Clientで予期せぬエラーが発生しました。");
+        return Task.CompletedTask;
     }
 }
