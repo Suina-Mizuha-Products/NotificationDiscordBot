@@ -32,7 +32,7 @@ public class DiscordBotServiceTest
         var logSubscribed = false;
         var readySubscribed = false;
         var connectedSubscribed = false;
-        var disconectedSubscribed = false;
+        var disconnectedSubscribed = false;
 
         _discordClientMock.SetupAdd(c => c.Log += It.IsAny<Func<LogMessage, Task>>())
             .Callback(() => logSubscribed = true);
@@ -41,7 +41,7 @@ public class DiscordBotServiceTest
         _discordClientMock.SetupAdd(c => c.Connected += It.IsAny<Func<Task>>())
             .Callback(() => connectedSubscribed = true);
         _discordClientMock.SetupAdd(c => c.Disconnected += It.IsAny<Func<Exception, Task>>())
-            .Callback(() => disconectedSubscribed = true);
+            .Callback(() => disconnectedSubscribed = true);
 
         // Act
         var service = new DiscordBotService(
@@ -55,7 +55,7 @@ public class DiscordBotServiceTest
         Assert.True(logSubscribed);
         Assert.True(readySubscribed);
         Assert.True(connectedSubscribed);
-        Assert.True(disconectedSubscribed);
+        Assert.True(disconnectedSubscribed);
     }
 
     [Fact]
