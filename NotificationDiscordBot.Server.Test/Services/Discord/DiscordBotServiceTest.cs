@@ -126,32 +126,30 @@ public class DiscordBotServiceTest
     {
         // Arrange
         _configurationMock.Setup(c => c["Discord:Token"]).Returns("dummy token");
-        
-        var logInCalled = false;
-        var startCalled = false;
+
+        var logInCalled = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var startCalled = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         _discordClientMock.Setup(c => c.LoginAsync(TokenType.Bot, It.IsAny<string>()))
-            .Callback(() => logInCalled = true)
+            .Callback(() => logInCalled.SetResult(true))
             .Returns(Task.CompletedTask);
 
         _discordClientMock.Setup(c => c.StartAsync())
-            .Callback(() => startCalled = true)
+            .Callback(() => startCalled.SetResult(true))
             .Returns(Task.CompletedTask);
 
         var service = new DiscordBotService(
             _loggerMock.Object,
             _configurationMock.Object,
             _discordClientMock.Object);
+
         // Act
         var executeTask = service.StartAsync(CancellationToken.None);
-        
-        // ExecuteAsyncが実行されるまで待機
-        await Task.Delay(100, TestContext.Current.CancellationToken);
-        
+        await Task.WhenAll(logInCalled.Task, startCalled.Task); // Wait for both tasks to complete
+
         // Assert
-        Assert.True(executeTask.IsCompleted);
-        Assert.True(logInCalled);
-        Assert.True(startCalled);
+        _discordClientMock.Verify(c => c.LoginAsync(TokenType.Bot, "dummy token"), Times.Once);
+        _discordClientMock.Verify(c => c.StartAsync(), Times.Once);
 
         // Cleanup
         await service.StopAsync(CancellationToken.None);
