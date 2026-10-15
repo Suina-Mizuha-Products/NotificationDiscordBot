@@ -100,7 +100,7 @@ public class SendNotificationServiceTest
         _configurationMock.Setup(c => c["Discord:ChannelId"]).Returns(channelId);
         var service = new SendNotificationService(_loggerMock.Object, _configurationMock.Object, _discordClientMock.Object);
         _discordClientMock.Setup(c => c.GetTextChannel(It.IsAny<ulong>())).Returns(_socketTextChannelMock.Object);
-        _socketTextChannelMock.Setup(c => c.SendMessageAsync(It.IsAny<string>())).Returns(Task.FromResult((RestUserMessage)null));
+        _socketTextChannelMock.Setup(c => c.SendMessageAsync(It.IsAny<string>(), false, It.IsAny<Embed>(), null, null, null, null, null, null, MessageFlags.None, null)).Returns(Task.FromResult((RestUserMessage)null));
 
         // Act
         var result = await service.SendTwitchOnlineNotificationMessageAsync(userLogin, userName, profileImageUrl, title, gameName, startedAt, thumnailUrl);
