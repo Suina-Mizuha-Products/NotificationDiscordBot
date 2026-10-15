@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using NotificationDiscordBot.Server.Interfaces.Services.Discord;
 using IDiscordClient = NotificationDiscordBot.Server.Interfaces.Services.Discord.IDiscordClient;
 
 namespace NotificationDiscordBot.Server.Services.Discord;
@@ -32,4 +33,12 @@ public class DiscordClientWrapper : IDiscordClient
 
     public Task StartAsync()
         => _client.StartAsync();
+
+    public ISocketTextChannel? GetTextChannel(ulong channelId)
+    {
+        var channel = _client.GetChannel(channelId) as SocketTextChannel;
+        if (channel == null)
+            return null;
+        return new SocketTextChannelWrapper(channel);
+    }
 }
