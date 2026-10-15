@@ -12,8 +12,9 @@ public class SendNotificationService : ISendNotificationService
 
     public SendNotificationService(ILogger<SendNotificationService> logger, IConfiguration configuration, DiscordSocketClient discordClient)
     {
-        _logger = logger;
-        _discordClient = discordClient;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _discordClient = discordClient ?? throw new ArgumentNullException(nameof(discordClient));
+        configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
         var channelIdString = configuration["Discord:ChannelId"] ?? throw new InvalidOperationException("チャンネルIdが設定されていません。");
         var isUlong = ulong.TryParse(channelIdString, out _channelId);
