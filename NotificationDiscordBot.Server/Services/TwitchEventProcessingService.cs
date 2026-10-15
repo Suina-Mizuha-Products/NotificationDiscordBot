@@ -52,7 +52,6 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
 
             if(eventData.Event is StreamOnlineEvent streamOnlineEvent)
             {
-                // TODO: 配信開始イベントの処理を実装
                 _logger.LogInformation("配信開始イベントが受信されました。Broadcaster: {BroadcasterUserName}, StreamId: {StreamId}", streamOnlineEvent.BroadcasterUserName, streamOnlineEvent.Id);
 
                 //認証情報の取得
@@ -63,9 +62,8 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
                     return false;
                 }
 
-                #region 見せられないよ
-                streamOnlineEvent.BroadcasterUserId = "720371087";
-                #endregion
+                // Twitch CLIでのテスト用にBroadcasterUserIdを固定値に設定
+                // streamOnlineEvent.BroadcasterUserId = "BroadcasterUserId";
 
                 // ストリーム情報の取得
                 var streamData = await _twitchApiInvocationService.GetStreamsAsync(credentials.AccessToken, streamOnlineEvent.BroadcasterUserId);
