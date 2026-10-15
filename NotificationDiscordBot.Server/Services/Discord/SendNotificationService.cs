@@ -1,16 +1,17 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using NotificationDiscordBot.Server.Interfaces.Services.Discord;
+using IDiscordClient = NotificationDiscordBot.Server.Interfaces.Services.Discord.IDiscordClient;
 
 namespace NotificationDiscordBot.Server.Services.Discord;
 
 public class SendNotificationService : ISendNotificationService
 {
     private readonly ILogger<SendNotificationService> _logger;
-    private readonly DiscordSocketClient _discordClient;
+    private readonly IDiscordClient _discordClient;
     private readonly ulong _channelId;
 
-    public SendNotificationService(ILogger<SendNotificationService> logger, IConfiguration configuration, DiscordSocketClient discordClient)
+    public SendNotificationService(ILogger<SendNotificationService> logger, IConfiguration configuration, IDiscordClient discordClient)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _discordClient = discordClient ?? throw new ArgumentNullException(nameof(discordClient));
@@ -48,14 +49,14 @@ public class SendNotificationService : ISendNotificationService
             .WithColor(new Color(0x6441A5))
             .WithTimestamp(startedDateTimeOffset);
 
-        var channel = _discordClient.GetChannel(_channelId) as SocketTextChannel;
+        var channel = _discordClient.GetTextChannel(_channelId);
         if(channel == null)
         {
             _logger.LogWarning("チャンネルの取得に失敗しました。");
             return false;
         }
 
-        await channel.SendMessageAsync("@here Stream Online!", embed: embedBuilder.Build());
+        _ = await channel.SendMessageAsync("@here Stream Online!", embed: embedBuilder.Build());
 
         return true;
     }
