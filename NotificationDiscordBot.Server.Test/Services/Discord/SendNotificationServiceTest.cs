@@ -4,6 +4,8 @@ using NotificationDiscordBot.Server.Services.Discord;
 using Microsoft.Extensions.Configuration;
 using Discord.WebSocket;
 using Discord;
+using IDiscordClient = NotificationDiscordBot.Server.Interfaces.Services.Discord.IDiscordClient;
+using NotificationDiscordBot.Server.Interfaces.Services.Discord;
 using Discord.Rest;
 
 namespace NotificationDiscordBot.Server.Test.Services.Discord;
@@ -12,8 +14,8 @@ public class SendNotificationServiceTest
 {
     private readonly Mock<ILogger<SendNotificationService>> _loggerMock;
     private readonly Mock<IConfiguration> _configurationMock;
-    private readonly Mock<DiscordSocketClient> _discordClientMock;
-    private readonly Mock<SocketTextChannel> _socketTextChannelMock;
+    private readonly Mock<IDiscordClient> _discordClientMock;
+    private readonly Mock<ISocketTextChannel> _socketTextChannelMock;
 
     private const string channelId = "123456";
     private const string userLogin = "test_user";
@@ -28,8 +30,8 @@ public class SendNotificationServiceTest
     {
         _loggerMock = new Mock<ILogger<SendNotificationService>>();
         _configurationMock = new Mock<IConfiguration>();
-        _discordClientMock = new Mock<DiscordSocketClient>();
-        _socketTextChannelMock = new Mock<SocketTextChannel>();
+        _discordClientMock = new Mock<IDiscordClient>();
+        _socketTextChannelMock = new Mock<ISocketTextChannel>();
     }
 
     #region コンストラクタのテスト
@@ -90,6 +92,40 @@ public class SendNotificationServiceTest
     #endregion
 
     #region SendTwitchOnlineNotificationMessageAsyncのテスト
+
+    [Fact]
+    public async Task Success_SendTwitchOnlineNotificationMessageAsync_メッセージが正常に送信される()
+    {
+        // Arrange
+        _configurationMock.Setup(c => c["Discord:ChannelId"]).Returns(channelId);
+        var service = new SendNotificationService(_loggerMock.Object, _configurationMock.Object, _discordClientMock.Object);
+        _discordClientMock.Setup(c => c.GetTextChannel(It.IsAny<ulong>())).Returns(_socketTextChannelMock.Object);
+        _socketTextChannelMock.Setup(c => c.SendMessageAsync(It.IsAny<string>())).Returns(Task.FromResult((RestUserMessage)null));
+
+        // Act
+        var result = await service.SendTwitchOnlineNotificationMessageAsync(userLogin, userName, profileImageUrl, title, gameName, startedAt, thumnailUrl);
+
+        // Assert
+        Assert.True(result);
+        _discordClientMock.Verify(c => c.GetTextChannel(It.IsAny<ulong>()), Times.Once);
+        _socketTextChannelMock.Verify(c => c.SendMessageAsync(It.IsAny<string>(), false, It.IsAny<Embed>(), null, null, null, null, null, null, MessageFlags.None, null), Times.Once);
+    }
+
+    [Fact]
+    public async Task Failure_SendTwitchOnlineNotificationMessageAsync_チャンネルの取得に失敗した場合falseが返される()
+    {
+        // Arrange
+        _configurationMock.Setup(c => c["Discord:ChannelId"]).Returns(channelId);
+        var service = new SendNotificationService(_loggerMock.Object, _configurationMock.Object, _discordClientMock.Object);
+        _discordClientMock.Setup(c => c.GetTextChannel(It.IsAny<ulong>())).Returns((ISocketTextChannel)null);
+
+        // Act
+        var result = await service.SendTwitchOnlineNotificationMessageAsync(userLogin, userName, profileImageUrl, title, gameName, startedAt, thumnailUrl);
+        
+        // Assert
+        Assert.False(result);
+        _discordClientMock.Verify(c => c.GetTextChannel(It.IsAny<ulong>()), Times.Once);
+    }
 
     #endregion
 }
