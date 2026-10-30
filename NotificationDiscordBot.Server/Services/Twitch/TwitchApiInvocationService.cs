@@ -15,8 +15,12 @@ public class TwitchApiInvocationService : ITwitchApiInvocationService
 
     public TwitchApiInvocationService(ILogger<TwitchApiInvocationService> logger, IConfiguration configuration, IHttpClientFactory clientFactory)
     {
-        _logger = logger;
-        _httpClientFactory = clientFactory;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _httpClientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
+        if (configuration == null)
+        {
+            throw new ArgumentNullException(nameof(configuration));
+        }
         _clientId = configuration["Twitch:ClientId"] ?? throw new ArgumentNullException("TwitchのClientIdが設定されていません。");
         _clientSecret = configuration["Twitch:ClientSecret"] ?? throw new ArgumentNullException("TwitchのClientSecretが設定されていません。");
     }
