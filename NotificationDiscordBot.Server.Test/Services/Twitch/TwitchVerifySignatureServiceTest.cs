@@ -110,6 +110,10 @@ public class TwitchVerifySignatureServiceTest
     {
         // Arrange
         var service = CreateService();
+        if (!string.IsNullOrEmpty(signature))
+        {
+            signature = ComputeSignature(messageId, messageTimestamp, requestBody);
+        }
         // Act
         var result = service.VerifySignature(messageId, messageTimestamp, requestBody, signature);
         // Assert
