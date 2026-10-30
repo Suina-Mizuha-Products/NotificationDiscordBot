@@ -88,7 +88,9 @@ public class TwitchVerifySignatureServiceTest
         var messageId = "test_message_id";
         var messageTimestamp = "2026-10-01T12:00:00Z";
         var requestBody = "{\"type\":\"notification\"}";
-        var signature = "sha256=invalid_signature";
+        var signature = ComputeSignature(messageId, messageTimestamp, requestBody);
+        signature = signature[..^1] + (signature[^1] == '0' ? '1' : '0'); // 署名を不正に変更
+
         // Act
         var result = service.VerifySignature(messageId, messageTimestamp, requestBody, signature);
         // Assert
