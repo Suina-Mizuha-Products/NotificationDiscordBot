@@ -152,7 +152,7 @@ public class TwitchApiInvocationServiceTest
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.BadRequest,
-                Content = new StringContent("bad request")
+                Content = new StringContent("{}")
             });
 
         var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
@@ -287,7 +287,7 @@ public class TwitchApiInvocationServiceTest
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.InternalServerError,
-                Content = new StringContent("internal server error")
+                Content = new StringContent("{}")
             });
 
         var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
@@ -420,7 +420,7 @@ public class TwitchApiInvocationServiceTest
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.BadGateway,
-                Content = new StringContent("bad gateway")
+                Content = new StringContent("{}")
             });
 
         var httpClient = new HttpClient(_httpMessageHandlerMock.Object);
