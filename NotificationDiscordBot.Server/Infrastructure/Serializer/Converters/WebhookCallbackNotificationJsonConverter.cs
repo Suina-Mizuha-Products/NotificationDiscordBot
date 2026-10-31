@@ -9,7 +9,7 @@ namespace NotificationDiscordBot.Server.Infrastructure.Serializer.Converters;
 /// </summary>
 ///
 /// <remarks>このプロパティは、シリアル化時に無視されます。イベントの内容を直接解析する必要がある場合に使用してください。型安全なプロパティが存在しないイベントに対して、柔軟なデータアクセスを提供します。</remarks>
-public class UnknownEvent: EventBase
+public class UnknownEvent : EventBase
 {
     [JsonIgnore]
     public JsonElement RawData { get; set; }
@@ -59,7 +59,7 @@ public class WebhookCallbackNotificationJsonConverter : JsonConverter<WebhookCal
         if (eventType == typeof(UnknownEvent))
         {
             // 元のJsonデータが破棄された場合アクセスできなくなるため、JsonElementをクローンして保持する
-            var eventJsonElement = eventElement.Clone(); 
+            var eventJsonElement = eventElement.Clone();
             eventData = new UnknownEvent { RawData = eventJsonElement };
         }
         else

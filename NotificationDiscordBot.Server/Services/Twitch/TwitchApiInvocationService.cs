@@ -72,7 +72,7 @@ public class TwitchApiInvocationService : ITwitchApiInvocationService
         try
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{TwitchEndpoint}/streams?user_id={userId}");
-            
+
             request.Headers.Add("Client-ID", _clientId);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 

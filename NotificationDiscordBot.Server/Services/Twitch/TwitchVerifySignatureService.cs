@@ -16,15 +16,15 @@ public class TwitchVerifySignatureService : ITwitchVerifySignatureService
         if (configuration == null)
         {
             throw new ArgumentNullException(nameof(configuration));
-        }          
+        }
         _twitchSecret = configuration["Twitch:ClientSecret"] ?? throw new InvalidOperationException("TwitchのClientSecretが構成されていません。");
     }
 
     public bool VerifySignature(string messageId, string messageTimestamp, string requestBody, string signature)
     {
-        if(string.IsNullOrEmpty(messageId) || 
-           string.IsNullOrEmpty(messageTimestamp) || 
-           string.IsNullOrEmpty(requestBody) || 
+        if (string.IsNullOrEmpty(messageId) ||
+           string.IsNullOrEmpty(messageTimestamp) ||
+           string.IsNullOrEmpty(requestBody) ||
            string.IsNullOrEmpty(signature))
         {
             _logger.LogWarning("署名検証に必要なパラメータが不足しています。");

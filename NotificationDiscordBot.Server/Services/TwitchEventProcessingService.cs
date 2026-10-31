@@ -53,13 +53,13 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
                 return false;
             }
 
-            if(eventData.Event == null)
+            if (eventData.Event == null)
             {
                 _logger.LogWarning("イベントデータにイベント情報が含まれていません。MessageId: {MessageId}", messageId);
                 return false;
             }
 
-            if(eventData.Event is StreamOnlineEvent streamOnlineEvent)
+            if (eventData.Event is StreamOnlineEvent streamOnlineEvent)
             {
                 _logger.LogInformation("配信開始イベントが受信されました。Broadcaster: {BroadcasterUserName}, StreamId: {StreamId}", streamOnlineEvent.BroadcasterUserName, streamOnlineEvent.Id);
 
@@ -76,7 +76,7 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
 
                 // ストリーム情報の取得
                 var streamData = await _twitchApiInvocationService.GetStreamsAsync(credentials.AccessToken, streamOnlineEvent.BroadcasterUserId);
-                if(streamData == null)
+                if (streamData == null)
                 {
                     _logger.LogError("Twitchのストリーム情報の取得に失敗しました。");
                     return false;
@@ -89,7 +89,7 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
                 }
 
                 var currentStreamData = streamData.Data.FirstOrDefault();
-                if (currentStreamData == null) 
+                if (currentStreamData == null)
                 {
                     _logger.LogError("Twitchのストリーム情報の取得に失敗しました。");
                     return false;
@@ -109,7 +109,7 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
                 }
 
                 var currentUser = userInfo.Data.FirstOrDefault();
-                if(currentUser == null)
+                if (currentUser == null)
                 {
                     _logger.LogWarning("該当の配信が見つかりませんでした。");
                     // デプロイ環境で問題があればリトライ処理を追加
