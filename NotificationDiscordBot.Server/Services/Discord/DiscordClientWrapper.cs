@@ -28,7 +28,7 @@ public class DiscordClientWrapper : IDiscordClient
     public event Func<Task>? Connected;
     public event Func<Exception, Task>? Disconnected;
 
-    public Task LoginAsync(TokenType tokenType, string token, bool validateToken = true) 
+    public Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
         => _client.LoginAsync(tokenType, token, validateToken);
 
     public Task StartAsync()

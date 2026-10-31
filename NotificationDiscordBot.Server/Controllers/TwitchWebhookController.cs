@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NotificationDiscordBot.Server.Entity;
 using NotificationDiscordBot.Server.Entity.Twitch;
 using NotificationDiscordBot.Server.Interfaces.Services;
 using NotificationDiscordBot.Server.Interfaces.Services.Twitch;
-using System.Text.Json;
 
 namespace NotificationDiscordBot.Server.Controllers;
 

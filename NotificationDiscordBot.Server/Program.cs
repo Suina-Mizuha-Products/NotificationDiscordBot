@@ -23,7 +23,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddHostedService<QueueHostedService>();
 builder.Services.AddSingleton<IBackgroundTaskQueue, DefaultBackgroundQueueService>(_ =>
 {
-    if(!int.TryParse(builder.Configuration["BackgroundTaskQueueCapacity"], out var capacity))
+    if (!int.TryParse(builder.Configuration["BackgroundTaskQueueCapacity"], out var capacity))
     {
         capacity = 100;
     }

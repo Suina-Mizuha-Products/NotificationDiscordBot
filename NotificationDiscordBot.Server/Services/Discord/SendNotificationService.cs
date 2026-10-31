@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using NotificationDiscordBot.Server.Interfaces.Services.Discord;
 using IDiscordClient = NotificationDiscordBot.Server.Interfaces.Services.Discord.IDiscordClient;
 
@@ -27,11 +26,11 @@ public class SendNotificationService : ISendNotificationService
 
     public async Task<bool> SendTwitchOnlineNotificationMessageAsync(
         string userLogin,
-        string userName, 
+        string userName,
         string profileImageUrl,
-        string title, 
-        string gameName, 
-        string startedAt, 
+        string title,
+        string gameName,
+        string startedAt,
         string thumnailUrl)
     {
         var twitchChannelUrl = $"https://www.twitch.tv/{userLogin}";
@@ -50,7 +49,7 @@ public class SendNotificationService : ISendNotificationService
             .WithTimestamp(startedDateTimeOffset);
 
         var channel = _discordClient.GetTextChannel(_channelId);
-        if(channel == null)
+        if (channel == null)
         {
             _logger.LogWarning("チャンネルの取得に失敗しました。");
             return false;

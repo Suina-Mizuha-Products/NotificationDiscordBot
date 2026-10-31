@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using IDiscordClient = NotificationDiscordBot.Server.Interfaces.Services.Discord.IDiscordClient;
 
 namespace NotificationDiscordBot.Server.Services.Discord;
@@ -90,7 +89,7 @@ public class DiscordBotService : BackgroundService, IDisposable
 
     private Task ReadyAsync()
     {
-        _logger.LogInformation("DiscordBotの準備完了。CurrentUserId: {CurrentUserId}, CurrentUserName: {CurrentUserName}", 
+        _logger.LogInformation("DiscordBotの準備完了。CurrentUserId: {CurrentUserId}, CurrentUserName: {CurrentUserName}",
             _client.CurrentUser.Id,
             _client.CurrentUser.Username);
         return Task.CompletedTask;
