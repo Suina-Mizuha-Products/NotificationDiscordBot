@@ -23,6 +23,11 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      Discord__Token: ${{ secrets.DISCORD_TOKEN_DEV }}
+      Discord__ChannelId: ${{ vars.DISCORD_CHANNEL_ID_DEV }}
+      Twitch__ClientId: ${{ secrets.TWITCH_CLIENT_ID_DEV }}
+      Twitch__ClientSecret: ${{ secrets.TWITCH_CLIENT_SECRET_DEV }}
+      Twitch__BroadcasterUserId: ${{ vars.TWITCH_BROADCASTER_USER_ID_DEV }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
