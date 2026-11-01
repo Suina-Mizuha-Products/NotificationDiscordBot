@@ -50,7 +50,6 @@ builder.Services.AddScoped<ITwitchVerifySignatureService, TwitchVerifySignatureS
 builder.Services.AddScoped<ITwitchApiInvocationService, TwitchApiInvocationService>();
 builder.Services.AddScoped<ITwitchEventProcessingService, TwitchEventProcessingService>();
 builder.Services.AddScoped<ISendNotificationService, SendNotificationService>();
-builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
