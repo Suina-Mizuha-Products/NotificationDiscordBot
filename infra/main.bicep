@@ -32,6 +32,23 @@ module resources 'resources.bicep' = {
   }
 }
 
+module notificationdiscordbot_kv 'notificationdiscordbot-kv/notificationdiscordbot-kv.module.bicep' = {
+  name: 'notificationdiscordbot-kv'
+  scope: rg
+  params: {
+    location: location
+  }
+}
+module notificationdiscordbot_kv_roles 'notificationdiscordbot-kv-roles/notificationdiscordbot-kv-roles.module.bicep' = {
+  name: 'notificationdiscordbot-kv-roles'
+  scope: rg
+  params: {
+    location: location
+    notificationdiscordbot_kv_outputs_name: notificationdiscordbot_kv.outputs.name
+    principalId: resources.outputs.MANAGED_IDENTITY_PRINCIPAL_ID
+    principalType: 'ServicePrincipal'
+  }
+}
 
 output MANAGED_IDENTITY_CLIENT_ID string = resources.outputs.MANAGED_IDENTITY_CLIENT_ID
 output MANAGED_IDENTITY_NAME string = resources.outputs.MANAGED_IDENTITY_NAME
@@ -42,3 +59,4 @@ output AZURE_CONTAINER_REGISTRY_NAME string = resources.outputs.AZURE_CONTAINER_
 output AZURE_CONTAINER_APPS_ENVIRONMENT_NAME string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_NAME
 output AZURE_CONTAINER_APPS_ENVIRONMENT_ID string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_ID
 output AZURE_CONTAINER_APPS_ENVIRONMENT_DEFAULT_DOMAIN string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_DEFAULT_DOMAIN
+output NOTIFICATIONDISCORDBOT_KV_VAULTURI string = notificationdiscordbot_kv.outputs.vaultUri
