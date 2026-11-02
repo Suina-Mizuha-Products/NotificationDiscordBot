@@ -21,8 +21,8 @@ public class TwitchApiInvocationService : ITwitchApiInvocationService
         {
             throw new ArgumentNullException(nameof(configuration));
         }
-        _clientId = configuration["Twitch:ClientId"] ?? throw new ArgumentNullException("TwitchのClientIdが設定されていません。");
-        _clientSecret = configuration["Twitch:ClientSecret"] ?? throw new ArgumentNullException("TwitchのClientSecretが設定されていません。");
+        _clientId = configuration["Twitch-ClientId"] ?? throw new ArgumentNullException("TwitchのClientIdが設定されていません。");
+        _clientSecret = configuration["Twitch-ClientSecret"] ?? throw new ArgumentNullException("TwitchのClientSecretが設定されていません。");
     }
 
     public async Task<GetTwitchCredentialsResponse?> GetTwitchCredentialsAsync()

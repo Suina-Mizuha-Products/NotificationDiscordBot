@@ -45,6 +45,10 @@ jobs:
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
 
+      - name: Set non-secret environment variables
+        run: |
+          azd env set Discord__ChannelId "${{ vars.DISCORD_CHANNEL_ID_DEV }}"
+        shell: pwsh
 
       - name: Provision Infrastructure
         run: azd provision --no-prompt
