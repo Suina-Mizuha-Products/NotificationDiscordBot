@@ -45,20 +45,11 @@ jobs:
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
 
-      - name: Set non-secret environment variables
-        run: |
-          azd env set Discord__ChannelId "${{ vars.DISCORD_CHANNEL_ID_DEV }}"
-        shell: pwsh
-
       - name: Provision Infrastructure
         run: azd provision --no-prompt
 
       - name: Deploy Application
         run: azd deploy --no-prompt
         env:
-          Discord__Token: ${{ secrets.DISCORD_TOKEN_DEV }}
-          Discord__ChannelId: ${{ vars.DISCORD_CHANNEL_ID_DEV }}
-          Twitch__ClientId: ${{ secrets.TWITCH_CLIENT_ID_DEV }}
-          Twitch__ClientSecret: ${{ secrets.TWITCH_CLIENT_SECRET_DEV }}
           Twitch__BroadcasterUserId: ${{ vars.TWITCH_BROADCASTER_USER_ID_DEV }}
         
