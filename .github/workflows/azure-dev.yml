@@ -23,6 +23,7 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      Twitch__BroadcasterUserId: ${{ vars.TWITCH_BROADCASTER_USER_ID_DEV }}
 
     steps:
       - name: Checkout
@@ -50,6 +51,4 @@ jobs:
 
       - name: Deploy Application
         run: azd deploy --no-prompt
-        env:
-          Twitch__BroadcasterUserId: ${{ vars.TWITCH_BROADCASTER_USER_ID_DEV }}
         
