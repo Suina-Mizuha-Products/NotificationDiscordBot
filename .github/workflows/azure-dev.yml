@@ -23,7 +23,6 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-      Twitch__BroadcasterUserId: ${{ vars.TWITCH_BROADCASTER_USER_ID_DEV }}
 
     steps:
       - name: Checkout
@@ -45,6 +44,9 @@ jobs:
             --federated-credential-provider "github" `
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
+
+      - name: Set non-secret app config into azd env
+        run: azd env set Discord__ChannelId "${{ vars.DISCORD_CHANNEL_ID }}"
 
       - name: Provision Infrastructure
         run: azd provision --no-prompt
