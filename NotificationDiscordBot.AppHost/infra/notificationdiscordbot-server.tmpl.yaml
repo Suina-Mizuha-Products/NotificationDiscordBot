@@ -44,8 +44,7 @@ properties:
             secretRef: connectionstrings--notificationdiscordbot-kv
           - name: ConnectionStrings__notificationdiscordbot_kv
             secretRef: connectionstrings--notificationdiscordbot-kv
-          - name: Twitch__BroadcasterUserId
-            value: '{{ .Env.Twitch__BroadcasterUserId }}'
+
     scale:
       minReplicas: 1
 tags:
