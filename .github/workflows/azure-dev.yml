@@ -41,7 +41,7 @@ jobs:
       - name: Unit test
         run: |
           dotnet build
-          dotnet test ${{ env.SERVER_TEST_PROJECT_PATH }} --no build
+          dotnet test --project ${{ env.SERVER_TEST_PROJECT_PATH }} --no-build
 
   # Dev環境デプロイ
   develop-deploy:
