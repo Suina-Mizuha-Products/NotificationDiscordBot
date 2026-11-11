@@ -56,11 +56,12 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_ENV_NAME: 'develop'
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-
+      ACA_ENV_MODE: 'use-existing'
+      SHARED_ACA_ENV_NAME: ${{ vars.SHARED_ACA_ENV_NAME }}
+      SHARED_ACA_ENV_RG: ${{ vars.SHARED_ACA_ENV_RG }}
     steps:
-      - name: Install azd
-        uses: Azure/setup-azd@v2
-
+      - uses: actions/checkout@v4
+      - uses: Azure/setup-azd@v2
       - name: Log in with Azure (Federated Credentials)
         run: |
           azd auth login `
@@ -68,14 +69,13 @@ jobs:
             --federated-credential-provider "github" `
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
-
+      - name: Provision Preview
+        run: azd provision --preview --no-prompt
       - name: Provision Infrastructure
         run: azd provision --no-prompt
-
       - name: Deploy Application
         run: azd deploy --no-prompt
-  
-  
+
   # Release環境デプロイ
   release-deploy:
     runs-on: ubuntu-latest
@@ -89,11 +89,12 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_ENV_NAME: 'release'
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-
+      ACA_ENV_MODE: 'use-existing'
+      SHARED_ACA_ENV_NAME: ${{ vars.SHARED_ACA_ENV_NAME }}
+      SHARED_ACA_ENV_RG: ${{ vars.SHARED_ACA_ENV_RG }}
     steps:
-      - name: Install azd
-        uses: Azure/setup-azd@v2
-
+      - uses: actions/checkout@v4
+      - uses: Azure/setup-azd@v2
       - name: Log in with Azure (Federated Credentials)
         run: |
           azd auth login `
@@ -101,10 +102,10 @@ jobs:
             --federated-credential-provider "github" `
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
-
+      - name: Provision Preview
+        run: azd provision --preview --no-prompt
       - name: Provision Infrastructure
         run: azd provision --no-prompt
-
       - name: Deploy Application
         run: azd deploy --no-prompt
 
@@ -121,11 +122,12 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_ENV_NAME: 'production'
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-
+      ACA_ENV_MODE: 'create'
+      SHARED_ACA_ENV_NAME: ''
+      SHARED_ACA_ENV_RG: ''
     steps:
-      - name: Install azd
-        uses: Azure/setup-azd@v2
-
+      - uses: actions/checkout@v4
+      - uses: Azure/setup-azd@v2
       - name: Log in with Azure (Federated Credentials)
         run: |
           azd auth login `
@@ -133,9 +135,9 @@ jobs:
             --federated-credential-provider "github" `
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
-
+      - name: Provision Preview
+        run: azd provision --preview --no-prompt
       - name: Provision Infrastructure
         run: azd provision --no-prompt
-
       - name: Deploy Application
         run: azd deploy --no-prompt

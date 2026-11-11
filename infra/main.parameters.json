@@ -10,7 +10,15 @@
       },
       "location": {
         "value": "${AZURE_LOCATION}"
+      },
+      "containerAppEnvironmentMode": {
+        "value": "${ACA_ENV_MODE}"
+      },
+      "sharedContainerAppEnvironmentName": {
+        "value": "${SHARED_ACA_ENV_NAME}"
+      },
+      "sharedContainerAppEnvironmentResourceGroupName": {
+        "value": "${SHARED_ACA_ENV_RG}"
       }
-    }
-  }
-  
+   }
+}

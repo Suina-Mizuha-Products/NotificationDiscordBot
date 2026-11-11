@@ -12,6 +12,14 @@ param location string
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
 
+@allowed([
+  'create'
+  'use-existing'
+])
+param containerAppEnvironmentMode string = 'create'
+
+param sharedContainerAppEnvironmentName string = ''
+param sharedContainerAppEnvironmentResourceGroupName string = ''
 
 var tags = {
   'azd-env-name': environmentName
@@ -22,6 +30,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   location: location
   tags: tags
 }
+
 module resources 'resources.bicep' = {
   scope: rg
   name: 'resources'
@@ -29,6 +38,9 @@ module resources 'resources.bicep' = {
     location: location
     tags: tags
     principalId: principalId
+    containerAppEnvironmentMode: containerAppEnvironmentMode
+    sharedContainerAppEnvironmentName: sharedContainerAppEnvironmentName
+    sharedContainerAppEnvironmentResourceGroupName: sharedContainerAppEnvironmentResourceGroupName
   }
 }
 
@@ -39,6 +51,7 @@ module notificationdiscordbot_kv 'notificationdiscordbot-kv/notificationdiscordb
     location: location
   }
 }
+
 module notificationdiscordbot_kv_roles 'notificationdiscordbot-kv-roles/notificationdiscordbot-kv-roles.module.bicep' = {
   name: 'notificationdiscordbot-kv-roles'
   scope: rg
