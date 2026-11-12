@@ -44,7 +44,6 @@ properties:
             secretRef: connectionstrings--notificationdiscordbot-kv
           - name: ConnectionStrings__notificationdiscordbot_kv
             secretRef: connectionstrings--notificationdiscordbot-kv
-
     scale:
       minReplicas: 1
 tags:
