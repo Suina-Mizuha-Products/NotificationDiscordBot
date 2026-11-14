@@ -23,8 +23,6 @@ properties:
     secrets:
       - name: connectionstrings--notificationdiscordbot-kv
         value: '{{ .Env.NOTIFICATIONDISCORDBOT_KV_VAULTURI }}'
-      - name: connectionstrings--notificationdiscordbot-kv
-        value: '{{ .Env.NOTIFICATIONDISCORDBOT_KV_VAULTURI }}'
   template:
     containers:
       - image: {{ .Image }}
