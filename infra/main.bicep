@@ -32,19 +32,19 @@ module resources 'resources.bicep' = {
   }
 }
 
-module notificationdiscordbot_kv 'notificationdiscordbot-kv/notificationdiscordbot-kv.module.bicep' = {
-  name: 'notificationdiscordbot-kv'
+module ndbotkv 'ndbotkv/ndbotkv.module.bicep' = {
+  name: 'ndbotkv'
   scope: rg
   params: {
     location: location
   }
 }
-module notificationdiscordbot_kv_roles 'notificationdiscordbot-kv-roles/notificationdiscordbot-kv-roles.module.bicep' = {
-  name: 'notificationdiscordbot-kv-roles'
+module ndbotkv_roles 'ndbotkv-roles/ndbotkv-roles.module.bicep' = {
+  name: 'ndbotkv-roles'
   scope: rg
   params: {
     location: location
-    notificationdiscordbot_kv_outputs_name: notificationdiscordbot_kv.outputs.name
+    ndbotkv_outputs_name: ndbotkv.outputs.name
     principalId: resources.outputs.MANAGED_IDENTITY_PRINCIPAL_ID
     principalType: 'ServicePrincipal'
   }
@@ -59,4 +59,4 @@ output AZURE_CONTAINER_REGISTRY_NAME string = resources.outputs.AZURE_CONTAINER_
 output AZURE_CONTAINER_APPS_ENVIRONMENT_NAME string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_NAME
 output AZURE_CONTAINER_APPS_ENVIRONMENT_ID string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_ID
 output AZURE_CONTAINER_APPS_ENVIRONMENT_DEFAULT_DOMAIN string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_DEFAULT_DOMAIN
-output NOTIFICATIONDISCORDBOT_KV_VAULTURI string = notificationdiscordbot_kv.outputs.vaultUri
+output NDBOTKV_VAULTURI string = ndbotkv.outputs.vaultUri

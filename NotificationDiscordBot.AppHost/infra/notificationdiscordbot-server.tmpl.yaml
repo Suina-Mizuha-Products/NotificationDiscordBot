@@ -21,8 +21,8 @@ properties:
       - server: {{ .Env.AZURE_CONTAINER_REGISTRY_ENDPOINT }}
         identity: {{ .Env.AZURE_CONTAINER_REGISTRY_MANAGED_IDENTITY_ID }}
     secrets:
-      - name: connectionstrings--notificationdiscordbot-kv
-        value: '{{ .Env.NOTIFICATIONDISCORDBOT_KV_VAULTURI }}'
+      - name: connectionstrings--ndbotkv
+        value: '{{ .Env.NDBOTKV_VAULTURI }}'
   template:
     containers:
       - image: {{ .Image }}
@@ -34,14 +34,12 @@ properties:
             value: "true"
           - name: HTTP_PORTS
             value: '{{ targetPortOrDefault 0 }}'
-          - name: NOTIFICATIONDISCORDBOT_KV_URI
-            value: '{{ .Env.NOTIFICATIONDISCORDBOT_KV_VAULTURI }}'
+          - name: NDBOTKV_URI
+            value: '{{ .Env.NDBOTKV_VAULTURI }}'
           - name: OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY
             value: in_memory
-          - name: ConnectionStrings__notificationdiscordbot-kv
-            secretRef: connectionstrings--notificationdiscordbot-kv
-          - name: ConnectionStrings__notificationdiscordbot_kv
-            secretRef: connectionstrings--notificationdiscordbot-kv
+          - name: ConnectionStrings__ndbotkv
+            secretRef: connectionstrings--ndbotkv
     scale:
       minReplicas: 1
 tags:
