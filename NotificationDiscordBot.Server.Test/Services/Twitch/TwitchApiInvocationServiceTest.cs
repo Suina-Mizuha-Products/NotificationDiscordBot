@@ -30,8 +30,8 @@ public class TwitchApiInvocationServiceTest
 
     private void SetupConfigurationMock()
     {
-        _configurationMock.Setup(c => c["Twitch:ClientId"]).Returns(testClientId);
-        _configurationMock.Setup(c => c["Twitch:ClientSecret"]).Returns(testClientSecret);
+        _configurationMock.Setup(c => c["Twitch-ClientId"]).Returns(testClientId);
+        _configurationMock.Setup(c => c["Twitch-ClientSecret"]).Returns(testClientSecret);
     }
 
     #region コンストラクタのテスト
@@ -78,8 +78,8 @@ public class TwitchApiInvocationServiceTest
     public void Failure_コンストラクタ_ClientIdが設定されていない場合ArgumentNullExceptionがスローされる()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Twitch:ClientId"]).Returns((string)null);
-        _configurationMock.Setup(c => c["Twitch:ClientSecret"]).Returns(testClientSecret);
+        _configurationMock.Setup(c => c["Twitch-ClientId"]).Returns((string)null);
+        _configurationMock.Setup(c => c["Twitch-ClientSecret"]).Returns(testClientSecret);
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => new TwitchApiInvocationService(_loggerMock.Object, _configurationMock.Object, _httpClientFactoryMock.Object));
     }
@@ -88,8 +88,8 @@ public class TwitchApiInvocationServiceTest
     public void Failure_コンストラクタ_ClientSecretが設定されていない場合ArgumentNullExceptionがスローされる()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Twitch:ClientId"]).Returns(testClientId);
-        _configurationMock.Setup(c => c["Twitch:ClientSecret"]).Returns((string)null);
+        _configurationMock.Setup(c => c["Twitch-ClientId"]).Returns(testClientId);
+        _configurationMock.Setup(c => c["Twitch-ClientSecret"]).Returns((string)null);
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => new TwitchApiInvocationService(_loggerMock.Object, _configurationMock.Object, _httpClientFactoryMock.Object));
     }

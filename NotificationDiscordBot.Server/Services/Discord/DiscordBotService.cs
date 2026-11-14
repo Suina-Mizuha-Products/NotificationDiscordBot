@@ -20,7 +20,7 @@ public class DiscordBotService : BackgroundService, IDisposable
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        var token = _configuration["Discord:Token"];
+        var token = _configuration["Discord-Token"];
         if (string.IsNullOrWhiteSpace(token))
         {
             throw new InvalidOperationException("Discordのトークンが設定されていません。");
