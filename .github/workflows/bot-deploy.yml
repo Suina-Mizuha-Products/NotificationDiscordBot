@@ -34,7 +34,7 @@ jobs:
       - name: build
         run: dotnet build
       - name: test
-        run: dotnet test ==project ${{ env.TEST_PROJECT_PATH }} --no-build
+        run: dotnet test --project ${{ env.TEST_PROJECT_PATH }} --no-build
     
   deploy-prod:
     runs-on: ubuntu-latest
