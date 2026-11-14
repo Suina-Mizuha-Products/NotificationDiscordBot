@@ -2,7 +2,7 @@
 param location string = resourceGroup().location
 
 resource notificationdiscordbot_kv 'Microsoft.KeyVault/vaults@2024-11-01' = {
-  name: take('notificationdiscordbotkv-${uniqueString(resourceGroup().id)}', 24)
+  name: take('ndbotkv-${uniqueString(resourceGroup().id)}', 24)
   location: location
   properties: {
     tenantId: tenant().tenantId
@@ -13,7 +13,7 @@ resource notificationdiscordbot_kv 'Microsoft.KeyVault/vaults@2024-11-01' = {
     enableRbacAuthorization: true
   }
   tags: {
-    'aspire-resource-name': 'notificationdiscordbot-kv'
+    'aspire-resource-name': 'ndbotkv'
   }
 }
 
