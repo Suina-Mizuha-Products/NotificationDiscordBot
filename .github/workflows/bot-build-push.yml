@@ -42,7 +42,7 @@ jobs:
       - name: test
         run: dotnet test --project ${{ env.TEST_PROJECT_PATH }} --no-build
     
-  push-image:
+  push-arm64:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/master'
@@ -69,8 +69,41 @@ jobs:
         run: |
           IMAGE_REPOSITORY=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           dotnet publish ./NotificationDiscordBot.Server/NotificationDiscordBot.Server.csproj \
-            --os linux --arch x64,arm64 \
+            --os linux --arch arm64 \
             -c Release \
             -t:PublishContainer \
             -p:ContainerRegistry=ghcr.io \
-            -p:ContainerRepository=${IMAGE_REPOSITORY}/bot-server \
+            -p:ContainerRepository=${IMAGE_REPOSITORY}-arm64/bot-server \
+
+  push-x64:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push bot-server image to GHCR
+        run: |
+          IMAGE_REPOSITORY=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          dotnet publish ./NotificationDiscordBot.Server/NotificationDiscordBot.Server.csproj \
+            --os linux --arch x64 \
+            -c Release \
+            -t:PublishContainer \
+            -p:ContainerRegistry=ghcr.io \
+            -p:ContainerRepository=${IMAGE_REPOSITORY}-x64/bot-server \
