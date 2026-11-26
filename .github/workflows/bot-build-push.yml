@@ -72,5 +72,4 @@ jobs:
             -c Release \
             -t:PublishContainer \
             -p:ContainerRegistry=ghcr.io \
-            -p:ContainerRepository=${IMAGE_REPOSITORY}/bot-server \
-            -p:ContainerImageTags="${{ github.sha }};latest"
+            -p:ContainerRepository=${IMAGE_REPOSITORY}/bot-server 
