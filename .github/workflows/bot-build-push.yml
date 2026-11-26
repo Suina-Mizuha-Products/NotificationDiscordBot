@@ -53,18 +53,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up .NET for the C# AppHost and API
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.x
-
-      - name: Install Aspire CLI
-        run: |
-          curl -sSL https://aspire.dev/install.sh | bash
-          echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
-
-      - name: Output Aspire CLI version
-        run: aspire --version
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -73,9 +65,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker images
-        env:
-          REGISTRY_ENDPOINT: ghcr.io
-          REGISTRY_REPOSITORY: ${{ github.repository }}
-
-        run: aspire do push
+      - name: Build and push bot-server image to GHCR
+        run: |
+          IMAGE_REPOSITORY=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          dotnet publish ./NotificationDiscordBot.Server/NotificationDiscordBot.Server.csproj \
+            -c Release \
+            -t:PublishContainer \
+            -p:ContainerRegistry=ghcr.io \
+            -p:ContainerRepository=${IMAGE_REPOSITORY}/bot-server \
+            -p:ContainerImageTags="${{ github.sha }};latest"
