@@ -1,8 +1,5 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var keyVault = builder.AddAzureKeyVault("ndbotkv");
-
-var server = builder.AddProject<Projects.NotificationDiscordBot_Server>("notificationdiscordbot-server")
-    .WithReference(keyVault);
+var server = builder.AddProject<Projects.NotificationDiscordBot_Server>("notificationdiscordbot-server");
 
 builder.Build().Run();

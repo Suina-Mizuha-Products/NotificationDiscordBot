@@ -28,7 +28,7 @@ public class DiscordBotServiceTest
     public void Success_コンストラクタ_全ての依存関係が提供された場合インスタンスが作成される()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns("dummy token");
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns("dummy token");
         var logSubscribed = false;
         var readySubscribed = false;
         var connectedSubscribed = false;
@@ -62,7 +62,7 @@ public class DiscordBotServiceTest
     public void Failure_コンストラクタ_ILoggerがnullの場合ArgumentNullExceptionがスローされる()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns("dummy token");
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns("dummy token");
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => new DiscordBotService(
             null,
@@ -85,7 +85,7 @@ public class DiscordBotServiceTest
     public void Failure_コンストラクタ_DiscordSocketClientがnullの場合ArgumentNullExceptionがスローされる()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns("dummy token");
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns("dummy token");
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => new DiscordBotService(
             _loggerMock.Object,
@@ -97,7 +97,7 @@ public class DiscordBotServiceTest
     public void Failure_コンストラクタ_DiscordのTokenが構成されていない場合InvalidOperationExceptionがスローされる()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns((string)null);
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns((string)null);
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => new DiscordBotService(
             _loggerMock.Object,
@@ -109,7 +109,7 @@ public class DiscordBotServiceTest
     public void Failure_コンストラクタ_DiscordのTokenが空文字の場合InvalidOperationExceptionがスローされる()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns(string.Empty);
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns(string.Empty);
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => new DiscordBotService(
             _loggerMock.Object,
@@ -125,7 +125,7 @@ public class DiscordBotServiceTest
     public async Task Success_ExecuteAsync_正常にログインと接続が行われる()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns("dummy token");
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns("dummy token");
 
         var logInCalled = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var startCalled = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -159,7 +159,7 @@ public class DiscordBotServiceTest
     public async Task Failure_ExecuteAsync_LoginAsyncが例外をスローした場合例外が伝播する()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns("dummy token");
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns("dummy token");
         _discordClientMock.Setup(c => c.LoginAsync(TokenType.Bot, It.IsAny<string>()))
             .ThrowsAsync(new Exception("Login failed"));
 
@@ -177,7 +177,7 @@ public class DiscordBotServiceTest
     public async Task Failure_ExecuteAsync_StartAsyncが例外をスローした場合例外が伝播する()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns("dummy token");
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns("dummy token");
         _discordClientMock.Setup(c => c.StartAsync())
             .ThrowsAsync(new Exception("Start failed"));
         
@@ -199,7 +199,7 @@ public class DiscordBotServiceTest
     public void Success_Dispose_イベントが解除される()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Discord-Token"]).Returns("dummy token");
+        _configurationMock.Setup(c => c["Discord:Token"]).Returns("dummy token");
         var logUnsubscribed = false;
         var readyUnsubscribed = false;
         var connectedUnsubscribed = false;
