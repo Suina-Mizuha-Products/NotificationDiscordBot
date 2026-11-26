@@ -69,9 +69,8 @@ jobs:
         run: |
           IMAGE_REPOSITORY=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           dotnet publish ./NotificationDiscordBot.Server/NotificationDiscordBot.Server.csproj \
+            --os linux --arch x64,arm64 \
             -c Release \
             -t:PublishContainer \
             -p:ContainerRegistry=ghcr.io \
             -p:ContainerRepository=${IMAGE_REPOSITORY}/bot-server \
-            -p:ContainerRuntimeIdentifiers="linux-x64;linux-arm64" \
-            -p:RuntimeIdentifier=linux-x64
