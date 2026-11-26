@@ -12,6 +12,7 @@ services:
       - "aspire"
     restart: "always"
   bot-server:
+    restart: "unless-stopped"
     image: "${BOT_SERVER_IMAGE}"
     environment:
       Discord__Token: "${Discord__Token:?Set Discord__Token}"
