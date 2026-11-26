@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>ae6e2cf1-a58d-41f9-8d9b-7a1ae9414353</UserSecretsId>
+	  <ContainerRegistry>ghcr.io</ContainerRegistry>
+	  <ContainerRepository>$\{IMAGE_REPOSITORY}/bot-server</ContainerRepository>
   </PropertyGroup>
 
   <ItemGroup>
