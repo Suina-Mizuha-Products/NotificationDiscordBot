@@ -12,8 +12,13 @@ services:
       - "aspire"
     restart: "always"
   bot-server:
+    restart: "unless-stopped"
     image: "${BOT_SERVER_IMAGE}"
     environment:
+      Discord__Token: "${Discord__Token:?Set Discord__Token}"
+      Discord__ChannelId: "${Discord__ChannelId:?Set Discord__ChannelId}"
+      Twitch__ClientId: "${Twitch__ClientId:?Set Twitch__ClientId}"
+      Twitch__ClientSecret: "${Twitch__ClientSecret:?Set Twitch__ClientSecret}"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "${BOT_SERVER_PORT}"
