@@ -1,0 +1,81 @@
+# Run when commits are pushed to develop/issue-24
+on:
+  workflow_dispatch:
+  push:
+    # Run when commits are pushed to mainline branch (main or master)
+    # Set this to the mainline branch you are using
+    branches:
+      - master
+      - release
+      - develop/**
+  pull_request:
+    # Run when pull requests are opened against mainline branch (main or master)
+    # Set this to the mainline branch you are using
+    branches:
+      - master
+      - release
+
+# Set up permissions for deploying with secretless Azure federated credentials
+# https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TEST_PROJECT_PATH: ./NotificationDiscordBot.Server.Test/NotificationDiscordBot.Server.Test.csproj
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: | 
+            8.x
+            9.x
+            10.x
+      - name: build
+        run: dotnet build
+      - name: test
+        run: dotnet test --project ${{ env.TEST_PROJECT_PATH }} --no-build
+    
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET for the C# AppHost and API
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Install Aspire CLI
+        run: |
+          curl -sSL https://aka.ms/aspire/install | bash
+          echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+
+      - name: Output Aspire CLI version
+        run: aspire --version
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker images
+        env:
+          REGISTRY_ENDPOINT: ghcr.io
+          REGISTRY_REPOSITORY: ${{ github.repository }}
+
+        run: aspire do push

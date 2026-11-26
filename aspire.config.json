@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "NotificationDiscordBot.AppHost/NotificationDiscordBot.AppHost.csproj"
+  }
+}

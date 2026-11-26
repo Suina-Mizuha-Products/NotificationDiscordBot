@@ -11,8 +11,8 @@ public sealed class QueueHostedService : BackgroundService
         ILogger<QueueHostedService> logger,
         IBackgroundTaskQueue taskQueue)
     {
-        _logger = logger;
-        _taskQueue = taskQueue;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _taskQueue = taskQueue ?? throw new ArgumentNullException(nameof(taskQueue));
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)

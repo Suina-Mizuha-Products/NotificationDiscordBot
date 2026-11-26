@@ -9,7 +9,7 @@ namespace NotificationDiscordBot.Server.Infrastructure.Serializer.Converters;
 /// </summary>
 ///
 /// <remarks>このプロパティは、シリアル化時に無視されます。イベントの内容を直接解析する必要がある場合に使用してください。型安全なプロパティが存在しないイベントに対して、柔軟なデータアクセスを提供します。</remarks>
-public class UnknownEvent: EventBase
+public class UnknownEvent : EventBase
 {
     [JsonIgnore]
     public JsonElement RawData { get; set; }
@@ -58,7 +58,9 @@ public class WebhookCallbackNotificationJsonConverter : JsonConverter<WebhookCal
 
         if (eventType == typeof(UnknownEvent))
         {
-            eventData = new UnknownEvent { RawData = eventElement };
+            // 元のJsonデータが破棄された場合アクセスできなくなるため、JsonElementをクローンして保持する
+            var eventJsonElement = eventElement.Clone();
+            eventData = new UnknownEvent { RawData = eventJsonElement };
         }
         else
         {
@@ -77,35 +79,9 @@ public class WebhookCallbackNotificationJsonConverter : JsonConverter<WebhookCal
         };
     }
 
-    /// <summary>
-    /// WebhookCallbackNotification オブジェクトを JSON 形式で書き込みます。
-    /// </summary>
-    /// <remarks>このメソッドは 'subscription' および 'event' プロパティを含む JSON オブジェクトとして WebhookCallbackNotification
-    /// を出力します。'event' の型に応じてシリアル化方法が異なります。</remarks>
-    /// <param name="writer">JSON データの書き込み先となる Utf8JsonWriter。</param>
-    /// <param name="value">シリアル化する WebhookCallbackNotification オブジェクト。null であってはなりません。</param>
-    /// <param name="options">シリアル化の動作を制御するための JsonSerializerOptions。</param>
     public override void Write(Utf8JsonWriter writer, WebhookCallbackNotification value, JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-
-        writer.WritePropertyName("subscription");   
-        JsonSerializer.Serialize(writer, value.Subscription, options);
-
-        writer.WritePropertyName("event");
-        switch(value.Event)
-        {
-            case StreamOnlineEvent streamOnlineEvent:
-                JsonSerializer.Serialize(writer, streamOnlineEvent, options);
-                break;
-            case UnknownEvent unknownEvent:
-                unknownEvent.RawData.WriteTo(writer);
-                break;
-            default:
-                JsonSerializer.Serialize(writer, value.Event, options);
-                break;
-        }
-
-        writer.WriteEndObject();
+        // WebhookCallbackNotification型からのシリアル化を行うユースケースは想定されていないため、NotSupportedExceptionをスローします。
+        throw new NotSupportedException("WebhookCallbackNotification のシリアル化はサポートされていません。");
     }
 }

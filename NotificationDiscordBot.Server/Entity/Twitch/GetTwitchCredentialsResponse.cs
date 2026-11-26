@@ -11,5 +11,5 @@ public class GetTwitchCredentialsResponse
     public int ExpiresIn { get; set; }
 
     [JsonPropertyName("token_type")]
-    public string TokenType { get; set; } = string.Empty;   
+    public string TokenType { get; set; } = string.Empty;
 }

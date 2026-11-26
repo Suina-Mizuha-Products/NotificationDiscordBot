@@ -9,6 +9,8 @@ public class DefaultBackgroundQueueService : IBackgroundTaskQueue
 
     public DefaultBackgroundQueueService(int capacity = 100)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity, nameof(capacity));
+
         var options = new BoundedChannelOptions(capacity)
         {
             FullMode = BoundedChannelFullMode.Wait

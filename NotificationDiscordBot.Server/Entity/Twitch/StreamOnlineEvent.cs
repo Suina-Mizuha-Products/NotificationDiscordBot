@@ -5,7 +5,7 @@ namespace NotificationDiscordBot.Server.Entity.Twitch;
 /// <summary>
 /// 配信開始イベントクラス
 /// </summary>
-public class StreamOnlineEvent: EventBase
+public class StreamOnlineEvent : EventBase
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;

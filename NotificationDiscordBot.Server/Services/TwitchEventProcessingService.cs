@@ -18,16 +18,25 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
         ITwitchApiInvocationService twitchApiInvocationService,
         ISendNotificationService notificationService)
     {
-        _logger = logger;
-        _twitchApiInvocationService = twitchApiInvocationService;
-        _notificationService = notificationService;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _twitchApiInvocationService = twitchApiInvocationService ?? throw new ArgumentNullException(nameof(twitchApiInvocationService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
     }
 
     public async Task<bool> ProcessNotificationAsync(string messageId, string requestBody, CancellationToken cancellationToken)
     {
         _logger.LogDebug("Twitchイベント通知の処理を開始します。MessageId: {MessageId}", messageId);
+
+        if (string.IsNullOrWhiteSpace(requestBody))
+        {
+            _logger.LogWarning("イベントデータが空です。MessageId: {MessageId}", messageId);
+            return false;
+        }
+
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             _logger.LogInformation("受信したイベントデータ: {RequestBody}", requestBody);
             var serializer = new WebhookCallbackNotificationJsonConverter();
             var options = new JsonSerializerOptions
@@ -44,15 +53,14 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
                 return false;
             }
 
-            if(eventData.Event == null)
+            if (eventData.Event == null)
             {
                 _logger.LogWarning("イベントデータにイベント情報が含まれていません。MessageId: {MessageId}", messageId);
                 return false;
             }
 
-            if(eventData.Event is StreamOnlineEvent streamOnlineEvent)
+            if (eventData.Event is StreamOnlineEvent streamOnlineEvent)
             {
-                // TODO: 配信開始イベントの処理を実装
                 _logger.LogInformation("配信開始イベントが受信されました。Broadcaster: {BroadcasterUserName}, StreamId: {StreamId}", streamOnlineEvent.BroadcasterUserName, streamOnlineEvent.Id);
 
                 //認証情報の取得
@@ -63,20 +71,25 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
                     return false;
                 }
 
-                #region 見せられないよ
-                streamOnlineEvent.BroadcasterUserId = "720371087";
-                #endregion
+                // Twitch CLIでのテスト用にBroadcasterUserIdを固定値に設定
+                // streamOnlineEvent.BroadcasterUserId = "BroadcasterUserId";
 
                 // ストリーム情報の取得
                 var streamData = await _twitchApiInvocationService.GetStreamsAsync(credentials.AccessToken, streamOnlineEvent.BroadcasterUserId);
-                if(streamData == null)
+                if (streamData == null)
                 {
                     _logger.LogError("Twitchのストリーム情報の取得に失敗しました。");
                     return false;
                 }
 
+                if (streamData.Data == null)
+                {
+                    _logger.LogError("Twitchのストリーム情報のデータが不正です。");
+                    return false;
+                }
+
                 var currentStreamData = streamData.Data.FirstOrDefault();
-                if (currentStreamData == null) 
+                if (currentStreamData == null)
                 {
                     _logger.LogError("Twitchのストリーム情報の取得に失敗しました。");
                     return false;
@@ -89,8 +102,14 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
                     return false;
                 }
 
+                if (userInfo.Data == null)
+                {
+                    _logger.LogError("Twitchのユーザー一覧情報のデータが不正です。");
+                    return false;
+                }
+
                 var currentUser = userInfo.Data.FirstOrDefault();
-                if(currentUser == null)
+                if (currentUser == null)
                 {
                     _logger.LogWarning("該当の配信が見つかりませんでした。");
                     // デプロイ環境で問題があればリトライ処理を追加
@@ -117,6 +136,11 @@ public class TwitchEventProcessingService : ITwitchEventProcessingService
 
             _logger.LogInformation("処理されていないイベントタイプが受信されました。MessageId: {MessageId}", messageId);
             return false;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogInformation("イベント通知の処理がキャンセルされました。MessageId: {MessageId}", messageId);
+            throw;
         }
         catch (Exception ex)
         {

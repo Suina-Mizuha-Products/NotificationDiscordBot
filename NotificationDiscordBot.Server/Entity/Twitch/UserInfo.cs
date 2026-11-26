@@ -21,7 +21,7 @@ public class UserInfo
 
     [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("profile_image_url")]
     public string ProfileImageUrl { get; set; } = string.Empty;
 
