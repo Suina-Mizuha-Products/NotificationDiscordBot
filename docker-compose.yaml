@@ -1,0 +1,29 @@
+services:
+  env-dashboard:
+    image: "mcr.microsoft.com/aspire/nightly/dashboard:17.0"
+    environment:
+      ASPIRE_DASHBOARD_TELEMETRY_OPTOUT: "true"
+    ports:
+      - "18888"
+    expose:
+      - "18889"
+      - "18890"
+    networks:
+      - "aspire"
+    restart: "always"
+  bot-server:
+    image: "${BOT_SERVER_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${BOT_SERVER_PORT}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://env-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "bot-server"
+    expose:
+      - "${BOT_SERVER_PORT}"
+    networks:
+      - "aspire"
+networks:
+  aspire:
+    driver: "bridge"
