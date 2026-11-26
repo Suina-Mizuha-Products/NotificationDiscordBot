@@ -42,7 +42,7 @@ jobs:
       - name: test
         run: dotnet test --project ${{ env.TEST_PROJECT_PATH }} --no-build
     
-  deploy-prod:
+  push-amd64:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/master'
@@ -72,4 +72,6 @@ jobs:
             -c Release \
             -t:PublishContainer \
             -p:ContainerRegistry=ghcr.io \
-            -p:ContainerRepository=${IMAGE_REPOSITORY}/bot-server 
+            -p:ContainerRepository=${IMAGE_REPOSITORY}/bot-server \
+            -p:ContainerRuntimeIdentifiers="linux-x64;linux-arm64" \
+            -p:RuntimeIdentifier=linux-x64
