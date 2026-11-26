@@ -11,8 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.6.5" />
-    <PackageReference Include="Aspire.Hosting.Azure.KeyVault" Version="13.6.5" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="17.0.0" />
+    <PackageReference Include="Aspire.Hosting.Docker" Version="17.0.0" />
+    <PackageReference Include="Aspire.Hosting.Dotnet" Version="17.0.0" />
   </ItemGroup>
 
   <ItemGroup>

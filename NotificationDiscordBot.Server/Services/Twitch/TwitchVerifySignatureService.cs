@@ -17,7 +17,7 @@ public class TwitchVerifySignatureService : ITwitchVerifySignatureService
         {
             throw new ArgumentNullException(nameof(configuration));
         }
-        _twitchSecret = configuration["Twitch-ClientSecret"] ?? throw new InvalidOperationException("TwitchのClientSecretが構成されていません。");
+        _twitchSecret = configuration["Twitch:ClientSecret"] ?? throw new InvalidOperationException("TwitchのClientSecretが構成されていません。");
     }
 
     public bool VerifySignature(string messageId, string messageTimestamp, string requestBody, string signature)

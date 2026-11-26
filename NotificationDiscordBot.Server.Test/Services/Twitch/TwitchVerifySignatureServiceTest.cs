@@ -21,7 +21,7 @@ public class TwitchVerifySignatureServiceTest
 
     private TwitchVerifySignatureService CreateService()
     {
-        _configurationMock.Setup(c => c["Twitch-ClientSecret"]).Returns(TwitchClientSecret);
+        _configurationMock.Setup(c => c["Twitch:ClientSecret"]).Returns(TwitchClientSecret);
         return new TwitchVerifySignatureService(_loggerMock.Object, _configurationMock.Object);
     }
 
@@ -38,7 +38,7 @@ public class TwitchVerifySignatureServiceTest
     public void Success_コンストラクタ_すべての依存関係が提供された場合インスタンスが作成される()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Twitch-ClientSecret"]).Returns(TwitchClientSecret);
+        _configurationMock.Setup(c => c["Twitch:ClientSecret"]).Returns(TwitchClientSecret);
         // Act
         var service = new TwitchVerifySignatureService(_loggerMock.Object, _configurationMock.Object);
         // Assert
@@ -49,7 +49,7 @@ public class TwitchVerifySignatureServiceTest
     public void Failure_コンストラクタ_ILoggerがnullの場合ArgumentNullExceptionがスローされる()
     {
         // Arrange
-        _configurationMock.Setup(c => c["Twitch-ClientSecret"]).Returns(TwitchClientSecret);
+        _configurationMock.Setup(c => c["Twitch:ClientSecret"]).Returns(TwitchClientSecret);
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => new TwitchVerifySignatureService(null, _configurationMock.Object));
     }

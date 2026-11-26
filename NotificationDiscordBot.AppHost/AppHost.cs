@@ -1,8 +1,11 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var keyVault = builder.AddAzureKeyVault("ndbotkv");
+builder.AddDockerComposeEnvironment("env");
 
-var server = builder.AddProject<Projects.NotificationDiscordBot_Server>("notificationdiscordbot-server")
-    .WithReference(keyVault);
+var server = builder.AddDotnetProject("bot-server", "../NotificationDiscordBot.Server/NotificationDiscordBot.Server.csproj")
+    .PublishAsDockerComposeService((resource, service) =>
+    {
+        service.Name = "bot-server";
+    });
 
 builder.Build().Run();
