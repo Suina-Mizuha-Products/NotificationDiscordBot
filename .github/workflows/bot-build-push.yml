@@ -46,28 +46,33 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/master'
-    env:
-      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
-      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install azd
-        uses: Azure/setup-azd@v2
 
-      - name: Log in with Azure (Federated Credentials)
+      - name: Set up .NET for the C# AppHost and API
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Install Aspire CLI
         run: |
-          azd auth login `
-            --client-id "$Env:AZURE_CLIENT_ID" `
-            --federated-credential-provider "github" `
-            --tenant-id "$Env:AZURE_TENANT_ID"
-        shell: pwsh
+          curl -sSL https://aka.ms/aspire/install | bash
+          echo "$HOME/.aspire/bin" >> $GITHUB_PATH"
 
-      - name: Provision Infrastructure
-        run: azd provision --no-prompt
+      - name: Output Aspire CLI version
+        run: aspire --version
 
-      - name: Deploy Application
-        run: azd deploy --no-prompt
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker images
+        env:
+          REGISTRY_ENDPOINT: ghcr.io
+          REGISTRY_REPOSITORY: ${{ github.repository }}
+
+        run: aspire do push
